@@ -1,0 +1,13 @@
+out/
+.cache/
+.classpath/
+.project/
+.settings/
+.idea/
+.idea_modules/
+project/project/
+target/
+.history
+.DS_Store
+.*.swp
+*.pyc
