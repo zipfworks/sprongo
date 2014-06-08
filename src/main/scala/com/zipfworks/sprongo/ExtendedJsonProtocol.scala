@@ -23,7 +23,7 @@ trait ExtendedJsonProtocol extends DefaultJsonProtocol {
   }
 
   implicit object BSONObjectIDJsonFormat extends JsonFormat[BSONObjectID] {
-    def write(id: BSONObjectID) = JsString(id.toString)
+    def write(id: BSONObjectID) = JsString(id.stringify)
     def read(value: JsValue) = value match {
       case JsString(x) => BSONObjectID(x)
       case x => deserializationError("Expected BSONObjectID as JsString, but got " + x)
