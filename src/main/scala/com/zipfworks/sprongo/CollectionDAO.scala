@@ -111,6 +111,14 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     collection.update(selector, update)
   }
 
+  def update(u: UpdateQuery): Future[LastError] = {
+    collection.update(
+      selector = u.selector,
+      update = u.update,
+      upsert = u.upsert,
+      multi = u.multi)
+  }
+
   def updatePart(m: M, query: BSONDocument) = {
     val selector = BSONDocument("_id" -> m.id)
     val update = BSONDocument("$set" -> query)
