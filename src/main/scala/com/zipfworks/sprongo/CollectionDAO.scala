@@ -10,6 +10,7 @@ import ExtendedJsonProtocol._
 import reactivemongo.api.QueryOpts
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.default.BSONCollection
+import SprongoDSL.UpdateQuery
 
 class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionContext, jsFormat: RootJsonFormat[M], db: DefaultDB) {
 
