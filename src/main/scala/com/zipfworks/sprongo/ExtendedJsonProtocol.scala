@@ -1,5 +1,6 @@
 package com.zipfworks.sprongo
 
+import reactivemongo.bson.BSONObjectID
 import spray.json._
 import org.joda.time.DateTime
 import reactivemongo.api.SortOrder
