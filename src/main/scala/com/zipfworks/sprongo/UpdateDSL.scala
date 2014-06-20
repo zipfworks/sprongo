@@ -2,6 +2,8 @@ package com.zipfworks.sprongo
 
 import reactivemongo.bson.{BSONInteger, Producer, BSONValue, BSONDocument}
 
+import scala.util.Try
+
 trait UpdateOperation {
   def build: BSONDocument
 }
@@ -38,7 +40,12 @@ case class UpdateQuery(
 }
 
 class UpdateExpectsSelector {
-  def selector(s: BSONDocument) = new UpdateExpectsUpdateDef(s)
+
+  def selector(s: BSONDocument)                    = new UpdateExpectsUpdateDef(s)
+  def selector(s: Producer[(String, BSONValue)] *) = new UpdateExpectsUpdateDef(BSONDocument(s: _*))
+
+  def id(id: String)    = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
+  def id(id: BSONValue) = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
 }
 
 class UpdateExpectsUpdateDef(s: BSONDocument) {
