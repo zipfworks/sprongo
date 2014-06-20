@@ -10,7 +10,7 @@ import ExtendedJsonProtocol._
 import reactivemongo.api.QueryOpts
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.default.BSONCollection
-import SprongoDSL.UpdateQuery
+import SprongoDSL._
 
 class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionContext, jsFormat: RootJsonFormat[M], db: DefaultDB) {
 
@@ -179,12 +179,21 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     db.command(new Distinct(collectionName, field, Some(query)))
   }
 
-  def execute(u: UpdateQuery): Future[LastError] = {
+  def exec(u: UpdateQuery): Future[LastError] = {
     collection.update(
       selector = u.selector,
       update = u.update,
       upsert = u.upsert,
       multi = u.multi)
+  }
+
+  def exec(u: UpdateModelQuery[M]): Future[LastError] = {
+    collection.update(
+      selector = BSONDocument("_id" -> u.m.id),
+      update = JsonBsonConverter.jsObjToBdoc(u.m.toJson.asJsObject),
+      upsert = u.upsert,
+      multi = u.multi
+    )
   }
 
 }

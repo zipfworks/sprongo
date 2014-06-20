@@ -1,10 +1,6 @@
 package com.zipfworks.sprongo
 
 import reactivemongo.bson.{BSONInteger, Producer, BSONValue, BSONDocument}
-import spray.json._
-
-//in case you just want the update dsl piece
-object UpdateDSL extends UpdateDSL
 
 trait UpdateDSL {
 
@@ -17,8 +13,12 @@ trait UpdateDSL {
                           multi: Boolean = false
                           ){
     def upsert(b: Boolean): UpdateQuery = this.copy(upsert = b)
-
     def multi(b: Boolean): UpdateQuery = this.copy(multi = b)
+  }
+
+  case class UpdateModelQuery[T](m: T, upsert: Boolean = false, multi: Boolean = false){
+    def upsert(b: Boolean): UpdateModelQuery[T] = this.copy(upsert = b)
+    def multi(b: Boolean): UpdateModelQuery[T] = this.copy(multi = b)
   }
 
   class UpdateExpectsSelector {
@@ -26,10 +26,7 @@ trait UpdateDSL {
     def selector(s: BSONDocument)                    = new UpdateExpectsUpdateDef(s)
     def selector(s: Producer[(String, BSONValue)] *) = new UpdateExpectsUpdateDef(BSONDocument(s: _*))
 
-    def model[T <: Model](m: T)(implicit writer: JsonWriter[T]) = UpdateQuery(
-      selector = BSONDocument("_id" -> m.id),
-      update = JsonBsonConverter.jsObjToBdoc(m.toJson.asJsObject)
-    )
+    def model[T <: Model](m: T) = UpdateModelQuery[T](m)
 
     def id(id: String)    = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
     def id(id: BSONValue) = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
