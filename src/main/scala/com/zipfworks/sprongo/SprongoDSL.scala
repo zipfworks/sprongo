@@ -1,3 +1,6 @@
 package com.zipfworks.sprongo
 
-object SprongoDSL extends UpdateDSL
+object SprongoDSL
+  extends UpdateDSL
+  with DeleteDSL
+  with ReadDSL
