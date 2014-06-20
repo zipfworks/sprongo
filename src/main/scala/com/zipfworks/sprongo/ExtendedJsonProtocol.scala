@@ -21,6 +21,14 @@ trait ExtendedJsonProtocol extends DefaultJsonProtocol {
       case -1 => SortOrder.Descending
     }
   }
+
+  implicit object BSONObjectIDJsonFormat extends JsonFormat[BSONObjectID] {
+    def write(id: BSONObjectID) = JsString(id.stringify)
+    def read(value: JsValue) = value match {
+      case JsString(x) => BSONObjectID(x)
+      case x => deserializationError("Expected BSONObjectID as JsString, but got " + x)
+    }
+  }
 }
 
 object ExtendedJsonProtocol extends ExtendedJsonProtocol
