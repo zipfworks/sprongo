@@ -54,6 +54,12 @@ trait ReadDSL {
   //read one
   case class ReadOneQuery(q: ReadQuery){
     def readPreference(readp: ReadPreference): ReadOneQuery = this.copy(q = q.readPreference(readp))
+    def projection(fields: Producer[(String, BSONValue)]*): ReadOneProjectionQuery = ReadOneProjectionQuery(q, fields)
+  }
+
+//  case class ReadOneProjectionQuery(q: ReadQuery, fields: Producer[(String, BSONValue)]*){
+  case class ReadOneProjectionQuery(q: ReadQuery, fields: Seq[Producer[(String, BSONValue)]]){
+    def readPreference(readp: ReadPreference) = this.copy(q = q.readPreference(readp))
   }
 
 }

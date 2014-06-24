@@ -272,7 +272,19 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
   }
 
   def exec(r: ReadOneQuery): Future[Option[M]] = {
-    collection.find(r.q.sel).sort(r.q.sort).options(r.q.opts).one[M](readPreference = r.q.rp)
+    collection
+      .find(r.q.sel)
+      .sort(r.q.sort)
+      .options(r.q.opts)
+      .one[M](readPreference = r.q.rp)
+  }
+
+  def exec(r: ReadOneProjectionQuery): Future[Option[Map[String, JsValue]]] = {
+    collection
+      .find(r.q.sel, BSONDocument(r.fields: _*))
+      .sort(r.q.sort)
+      .options(r.q.opts)
+      .one[Map[String, JsValue]](readPreference = r.q.rp)
   }
 
 }
