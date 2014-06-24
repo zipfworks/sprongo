@@ -281,7 +281,7 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
 
   def exec(r: ReadOneProjectionQuery): Future[Option[Map[String, JsValue]]] = {
     collection
-      .find(r.q.sel, BSONDocument(r.fields: _*))
+      .find(r.q.sel, r.projection)
       .sort(r.q.sort)
       .options(r.q.opts)
       .one[Map[String, JsValue]](readPreference = r.q.rp)
