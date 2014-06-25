@@ -1,6 +1,7 @@
 package com.zipfworks.sprongo
 
 import reactivemongo.bson.{BSONInteger, Producer, BSONValue, BSONDocument}
+import spray.json.JsValue
 
 trait UpdateDSL {
 
@@ -47,11 +48,30 @@ trait UpdateDSL {
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/set/ **/
-  case class set(fieldVal: Producer[(String, BSONValue)]*) extends UpdateOperation {
+  case class set(fieldVal: BSONDocument) extends UpdateOperation {
     override def build: BSONDocument = {
-      BSONDocument("$set" -> BSONDocument(fieldVal: _*))
+      BSONDocument("$set" -> fieldVal)
     }
   }
+  object set {
+
+    def apply(fieldVal: Producer[(String, BSONValue)]*)
+             (implicit d: DummyImplicit): set = {
+      set(BSONDocument(fieldVal: _*))
+    }
+
+    def apply(fieldVal: (String, BSONValue)*)
+             (implicit d: DummyImplicit, d1: DummyImplicit): set = {
+      set(BSONDocument(fieldVal))
+    }
+
+    def apply(fieldVal: (String, JsValue)*)
+             (implicit d: DummyImplicit, d1: DummyImplicit, d2: DummyImplicit): set = {
+      set(BSONDocument(fieldVal.toMap.mapValues(JsonBsonConverter.jsValueToBsonVal)))
+    }
+
+  }
+
 
   /** http://docs.mongodb.org/manual/reference/operator/update/unset/ **/
   case class unset(fields: String*) extends UpdateOperation {
