@@ -10,13 +10,49 @@ organization := "com.zipfworks"
 
 credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
-publishTo := {
-  val nexus = "http://nexus.zipfworks.com/content/repositories/"
-  if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "snapshots")
-  else
-    Some("releases" at nexus + "releases")
+publishTo <<= (version) { version: String =>
+  val nexus = "https://oss.sonatype.org/"
+  if (version.trim.endsWith("SNAPSHOT")) {
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+   } else {
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  }
 }
+
+publishMavenStyle := true
+
+publishArtifact in Test := true
+
+pomIncludeRepository := { _ => false }
+
+pomExtra := (
+  <url>https://github.com/zipfworks/sprongo</url>
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:zipfworks/sprongo.git</url>
+    <connection>scm:git:git@github.com:zipfworks/sprongo.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>kfang</id>
+      <name>Kevin Fang</name>
+    </developer>
+    <developer>
+      <id>Stanback</id>
+      <name>Brian Stanback</name>
+    </developer>
+    <developer>
+      <id>dvliman</id>
+      <name>David Liman</name>
+     </developer>
+  </developers>
+)
 
 resolvers := Seq(
   "sonatype-releases"   at "https://oss.sonatype.org/content/repositories/releases/",
