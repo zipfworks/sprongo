@@ -179,7 +179,20 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
   def distinct(field: String, query: BSONDocument = defaultQueryDoc): Future[BSONArray] = {
     db.command(new Distinct(collectionName, field, Some(query)))
   }
+  /**********************************************************************************
+    * Creates
+    *********************************************************************************/
+  def exec(c: CreateQuery): Future[LastError] = {
+    collection.insert(c.document)
+  }
 
+  def exec(c: CreateBulkQuery[M]): Future[Int] = {
+    collection.bulkInsert(Enumerator.enumerate(c.ds), c.bulkSize, c.bulkByteSize)
+  }
+
+  /**********************************************************************************
+    * Updates
+    *********************************************************************************/
   def exec(u: UpdateQuery): Future[LastError] = {
     collection.update(
       selector = u.selector,
@@ -197,6 +210,9 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     )
   }
 
+  /**********************************************************************************
+    * Deletes
+    *********************************************************************************/
   def exec(d: DeleteQuery): Future[LastError] = {
     collection.remove(
       query = d.s,
@@ -211,6 +227,10 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     )
   }
 
+
+  /**********************************************************************************
+   * Reads
+   *********************************************************************************/
   private def getCursor(r: ReadQuery): Cursor[M] = {
     collection
       .find(r.sel)

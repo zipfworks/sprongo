@@ -1,6 +1,6 @@
 name := "sprongo"
 
-version := "1.0.4"
+version := "1.1.0-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
