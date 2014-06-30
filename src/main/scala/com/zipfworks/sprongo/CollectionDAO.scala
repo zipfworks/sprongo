@@ -29,47 +29,41 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     }
   }
 
+  private implicit val docWriter = new BSONDocumentWriter[M] {
+    override def write(t: M): BSONDocument = {
+      JsonBsonConverter.jsObjToBdoc(t.toJson.asJsObject)
+    }
+  }
+
   private implicit val mapDocReader = new BSONDocumentReader[Map[String, JsValue]] {
     override def read(bson: BSONDocument): Map[String, JsValue] = {
       JsonBsonConverter.bdocToJsObject(bson).convertTo[Map[String, JsValue]]
     }
   }
 
-  def create(m: M) = {
+  @deprecated("use SprongoDSL.create.model()", "June 30, 2014")
+  def create(m: M): Future[LastError] = {
     val bdoc = JsonBsonConverter.jsObjToBdoc(m.toJson.asJsObject)
     collection.insert(bdoc)
   }
 
-  /**
-   * read WITH a projection
-   * @param pq ProjectionQuery -> wrapper for a query and projection
-   * @return A Map[String, JsValue] map because it can't get all the way to a case class
-   */
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def read(pq: ProjectionQuery): Cursor[Map[String, JsValue]] = {
     collection.find(pq.query, pq.projection).options(pq.options).sort(pq.sort).cursor[Map[String, JsValue]]
   }
 
-  /**
-   * read WITHOUT a projection, see above
-   * @param q BSONDocument
-   * @param options QueryOpts
-   * @param sort BSONDocument
-   * @return The actual case class
-   */
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def read(q: BSONDocument = defaultQueryDoc, options: QueryOpts = defaultQueryOpts, sort: BSONDocument = defaultSortDoc): Cursor[M] = {
     collection.find(q).options(options).sort(sort).cursor[M]
   }
 
-  /**
-   * Returns the Future of the object if id exists, None otherwise
-   * @param id ID of the model
-   * @return Future[ Option[None] ]
-   */
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def readById(id: String): Future[Option[M]] = {
     val q = BSONDocument("_id" -> id)
     read(q).collect[List](1).map(list => if(list.isEmpty) None else Some(list.head))
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def readOne(q: BSONDocument = defaultQueryDoc): Future[Option[M]] = readList(q).map {
     case Nil     => None
     case x :: xs => Some(x)
@@ -79,6 +73,7 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     if(skip < 0) options else options.skip(skip)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def readList(q: BSONDocument = defaultQueryDoc, options: QueryOpts = defaultQueryOpts,
                sort: BSONDocument = defaultSortDoc, limit: Int = -1, skip: Int = -1,
                stopOnError: Boolean = false): Future[List[M]] = {
@@ -91,6 +86,7 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     }
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def readList(pq: ProjectionQuery): Future[List[Map[String, JsValue]]] = {
     val options = if(pq.skip > 0) addSkip(pq.skip, pq.options) else pq.options
     val withCorrectOptions = pq.copy(options = options)
@@ -102,29 +98,34 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     }
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def readListByIds(idList: List[String]): Future[List[M]] = {
     val query = BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(idList.map(id => BSONString(id)))))
     read(query).collect[List]()
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def update(m: M) = {
     val selector = BSONDocument("_id" -> m.id)
     val update = JsonBsonConverter.jsObjToBdoc(m.toJson.asJsObject)
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def updatePart(m: M, query: BSONDocument) = {
     val selector = BSONDocument("_id" -> m.id)
     val update = BSONDocument("$set" -> query)
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def updatePart[T1](selector: BSONDocument, field: String, value: T1)(implicit write: JsonWriter[T1]): Future[LastError] = {
     val bsValue = JsonBsonConverter.jsValueToBsonVal(value.toJson)
     val update = BSONDocument("$set" -> BSONDocument(field -> bsValue))
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def updatePart[T1](id: String, field: String, value: T1)(implicit writer: JsonWriter[T1]): Future[LastError] = {
     val selector = BSONDocument("_id" -> id)
     updatePart(selector, field, value)
@@ -133,11 +134,8 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
 
   /**
    * http://docs.mongodb.org/manual/reference/operator/update/push/
-   * @param id: String - id of document
-   * @param field: String - field name of array
-   * @param value: what to push onto the array
-   * @return
    */
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def push[T1](id: String, field: String, value: T1)(implicit writer: JsonWriter[T1]): Future[LastError] = {
     val selector = BSONDocument("_id" -> id)
     val bsValue = JsonBsonConverter.jsValueToBsonVal(value.toJson)
@@ -145,29 +143,34 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def pull(id: String, field: String, query: BSONDocument): Future[LastError] = {
     val selector = BSONDocument("_id" -> id)
     val update = BSONDocument("$pull" -> BSONDocument(field -> query))
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def unset(selector: BSONDocument, fields: List[String]): Future[LastError] = {
     val unsetOps = fields.foldLeft(BSONDocument())((doc, field) => doc.add(field -> ""))
     val update = BSONDocument("$unset" -> unsetOps)
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def increment(id: String, field: String, amount: Int): Future[LastError] = {
     val selector = BSONDocument("_id" -> id)
     val update = BSONDocument("$inc" -> BSONDocument(field -> amount))
     collection.update(selector, update)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def delete(m: M) = {
     val selector = BSONDocument("_id" -> m.id)
     collection.remove(selector)
   }
 
+  @deprecated("use SprongoDSL", "June 30, 2014")
   def deleteById(id: String): Future[LastError] = {
     collection.remove(BSONDocument("_id" -> id))
   }
