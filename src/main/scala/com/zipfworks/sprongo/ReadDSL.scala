@@ -35,6 +35,7 @@ trait ReadDSL {
     def one = ReadOneQuery(this)
 
     def sort(s: Producer[(String, BSONValue)]*): ReadQuery = this.copy(sort = BSONDocument(s: _*))
+    def sort(s: BSONDocument): ReadQuery = this.copy(sort = s)
     def readPreference(readp: ReadPreference): ReadQuery = this.copy(rp = readp)
     def skip(i: Int): ReadQuery = this.copy(opts = opts.copy(skipN = i))
     def batchSize(i: Int): ReadQuery = this.copy(opts = opts.copy(batchSizeN = i))
