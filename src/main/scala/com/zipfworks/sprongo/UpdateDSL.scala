@@ -117,4 +117,21 @@ trait UpdateDSL {
       apply(field, JsonBsonConverter.jsValueToBsonVal(criteria.toJson))
   }
 
+  /** http://docs.mongodb.org/manual/reference/operator/update/pop/ **/
+  case class pop(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$pop" -> doc)
+  }
+
+  object pop {
+    trait PopPosition { val value: Int }
+    case object First extends PopPosition {
+      val value = -1
+    }
+    case object Last extends PopPosition {
+      val value = 1
+    }
+
+    def apply(field: String, pos: PopPosition): pop = pop(BSONDocument(field -> pos.value))
+  }
+
 }
