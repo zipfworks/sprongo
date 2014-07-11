@@ -117,20 +117,37 @@ trait UpdateDSL {
       apply(field, JsonBsonConverter.jsValueToBsonVal(criteria.toJson))
   }
 
+  /** http://docs.mongodb.org/manual/reference/operator/update/addToSet/ **/
+  case class addToSet(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$addToSet" -> doc)
+  }
+
+  object addToSet {
+    def apply[T](field: String, v: T)(implicit w: JsonWriter[T]): addToSet =
+      addToSet(BSONDocument(field -> JsonBsonConverter.jsValueToBsonVal(v.toJson)))
+
+    def apply(fieldVal: Producer[(String, BSONValue)]*):addToSet =
+      addToSet(BSONDocument(fieldVal: _*))
+
+    def apply(fieldVal: (String, JsValue)*)(implicit d: DummyImplicit): addToSet =
+      addToSet(BSONDocument(fieldVal.toMap.mapValues(JsonBsonConverter.jsValueToBsonVal)))
+  }
+
   /** http://docs.mongodb.org/manual/reference/operator/update/pop/ **/
+  trait PopPosition { val value: Int }
+
+  case object First extends PopPosition {
+    val value = -1
+  }
+  case object Last extends PopPosition {
+    val value = 1
+  }
+
   case class pop(doc: BSONDocument) extends UpdateOperation {
     override def build: BSONDocument = BSONDocument("$pop" -> doc)
   }
 
   object pop {
-    trait PopPosition { val value: Int }
-    case object First extends PopPosition {
-      val value = -1
-    }
-    case object Last extends PopPosition {
-      val value = 1
-    }
-
     def apply(field: String, pos: PopPosition): pop = pop(BSONDocument(field -> pos.value))
   }
 
