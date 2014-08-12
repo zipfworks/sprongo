@@ -1,7 +1,7 @@
 package com.zipfworks.sprongo
 
 import reactivemongo.bson.{BSONInteger, Producer, BSONValue, BSONDocument}
-import spray.json.JsValue
+import spray.json._
 
 trait UpdateDSL {
 
@@ -86,6 +86,69 @@ trait UpdateDSL {
     override def build: BSONDocument = {
       BSONDocument("$inc" -> BSONDocument(fieldVal: _*))
     }
+  }
+
+  /** http://docs.mongodb.org/manual/reference/operator/update/push/#up._S_push **/
+  case class push(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$push" -> doc)
+  }
+
+  object push {
+
+    def apply(fieldVal: Producer[(String, BSONValue)]*): push = push(BSONDocument(fieldVal: _*))
+
+    def apply[T](field: String, v: T)(implicit w: JsonWriter[T]): push =
+      push(BSONDocument(field -> JsonBsonConverter.jsValueToBsonVal(v.toJson)))
+
+    def apply(fieldVal: (String, JsValue)*)(implicit d: DummyImplicit): push =
+      push(BSONDocument(fieldVal.toMap.mapValues(JsonBsonConverter.jsValueToBsonVal)))
+  }
+
+  /** http://docs.mongodb.org/manual/reference/operator/update/pull/#up._S_pull **/
+  case class pull(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$pull" -> doc)
+  }
+
+  object pull {
+
+    def apply(field: String, criteria: BSONValue):pull = pull(BSONDocument(field -> criteria))
+
+    def apply[T](field: String, criteria: T)(implicit w: JsonWriter[T]): pull =
+      apply(field, JsonBsonConverter.jsValueToBsonVal(criteria.toJson))
+  }
+
+  /** http://docs.mongodb.org/manual/reference/operator/update/addToSet/ **/
+  case class addToSet(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$addToSet" -> doc)
+  }
+
+  object addToSet {
+    def apply[T](field: String, v: T)(implicit w: JsonWriter[T]): addToSet =
+      addToSet(BSONDocument(field -> JsonBsonConverter.jsValueToBsonVal(v.toJson)))
+
+    def apply(fieldVal: Producer[(String, BSONValue)]*):addToSet =
+      addToSet(BSONDocument(fieldVal: _*))
+
+    def apply(fieldVal: (String, JsValue)*)(implicit d: DummyImplicit): addToSet =
+      addToSet(BSONDocument(fieldVal.toMap.mapValues(JsonBsonConverter.jsValueToBsonVal)))
+  }
+
+  /** http://docs.mongodb.org/manual/reference/operator/update/pop/ **/
+  trait PopPosition { val value: Int }
+
+  case object First extends PopPosition {
+    val value = -1
+  }
+  case object Last extends PopPosition {
+    val value = 1
+  }
+
+  case class pop(doc: BSONDocument) extends UpdateOperation {
+    override def build: BSONDocument = BSONDocument("$pop" -> doc)
+  }
+
+  object pop {
+    def apply(field: String, pos: PopPosition): pop = pop(BSONDocument(field -> pos.value))
   }
 
 }

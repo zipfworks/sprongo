@@ -19,6 +19,8 @@ object JsonBsonConverter {
           case Failure(v) => None
         }).map(v => bsonValueToJsValue(v)).toList)
       case _: BSONDocument => bdocToJsObject(bval.asInstanceOf[BSONDocument])
+      case _: BSONNull.type => JsNull
+      case _: BSONUndefined.type => JsNull
       case _ =>
         println(bval.getClass)
         JsString(bval.getClass.toString)
