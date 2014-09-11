@@ -1,3 +1,7 @@
+import SonatypeKeys._
+
+sonatypeSettings
+
 name := "sprongo"
 
 version := "1.1.1-SNAPSHOT"
@@ -29,9 +33,8 @@ pomExtra := (
   <url>https://github.com/zipfworks/sprongo</url>
   <licenses>
     <license>
-      <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
+      <name>MIT</name>
+      <url>http://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
   <scm>
@@ -42,14 +45,17 @@ pomExtra := (
     <developer>
       <id>kfang</id>
       <name>Kevin Fang</name>
+      <url>https://github.com/kfang</url>
     </developer>
     <developer>
       <id>Stanback</id>
       <name>Brian Stanback</name>
+      <url>https://github.com/stanback</url>
     </developer>
     <developer>
       <id>dvliman</id>
       <name>David Liman</name>
+      <url>https://github.com/dvliman</url>
      </developer>
   </developers>
 )
@@ -60,6 +66,7 @@ resolvers := Seq(
   "Sonatype Snapshots"  at "http://oss.sonatype.org/content/repositories/snapshots/",
   "spray"               at "http://repo.spray.io/"
 )
+
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo"   % "0.10.0",
