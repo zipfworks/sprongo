@@ -13,12 +13,12 @@ with SBT:
     $ sbt
     > publish-local
 
-## Using the Library ##
+## Using the Library - QuickStart ##
 
 In order to use Sprongo in your project, first add it as a dependency in
 your project's build.sbt:
 
-    libraryDependencies += "com.zipfworks" %% "sprongo" % "1.0.4-SNAPSHOT"
+    libraryDependencies += "com.zipfworks" %% "sprongo" % "1.1.1-SNAPSHOT"
 
 In your project, create a class for the database driver and, classes for
 your models, and case classes for your JSON marshalling. You may pass an
@@ -26,11 +26,6 @@ optional actor system as the third argument to SprongoDB.
  Example:
 
 ```scala
-package com.zipfworks.sprongo-example
-
-import com.zipfworks.sprongo.{CollectionDAO, SprongoDB, Model, ExtendedJsonProtocol}
-import scala.concurrent.ExecutionContext.Implicits.global
-
 case class Widget (
   name:         String,
   quantity:     Int,
@@ -43,7 +38,7 @@ object Widget extends ExtendedJsonProtocol {
   implicit val widgetJsonFormat = jsonFormat5(Widget.apply)
 }
 
-class DBDriver(dbUrls: Seq[String], dbName: String, system: Option[ActorSystem] = None) extends SprongoDB(dbUrls, dbName, system) {
+class DBDriver(dbUrls: Seq[String], dbName: String, system: Option[ActorSystem]) extends SprongoDB(dbUrls, dbName, system) {
   object Widgets extends CollectionDAO[Widget]("widgets")
 }
 ```
@@ -53,17 +48,21 @@ the driver (or use a companion object) and access the DAO methods for your
 collections.
 
 ```scala
+val dbName = "sprongo-example-db"
+val dbUrls = Seq("localhost")
+val sys = ActorSystem("sprongo-example")
+val db = new DBDriver(dbUrls, dbName, Some(sys))
 
-val db = new DBDriver(Seq("localhost:27017"), "sprongo-example-db")
+
+// Use the DSL to query the db
+import com.zipfworks.sprongo.SprongoDSL._
 
 // Read a single record
-val widget = db.Widgets.findById("some-id")
+val widget = db.Widgets.exec(read.id("some-id"))
 
 // Read a list
-val listQuery = BSONDocument(
-  "quantity" -> BSONDocument("$gt" -> 1)
-)
-val widgets = db.Widgets.read(listQuery)
+val cmd = read.selector(BSONDocument("$gt" -> 1)).asList
+val widgets = db.Widgets.exec(cmd))
 
 // Create a record
 val newWidget = Widget(
@@ -73,14 +72,20 @@ val newWidget = Widget(
   description = Some("bar"),
   id          = UUID.randomUUID().toString
 )
-db.Widgets.create(newWidget)
+val cmd = create.model(newWidget)
+db.Widgets.exec(cmd)
 
 // Update a record
-db.Widgets.update(newWidget)
+val cmd = update.model(newWidget)
+db.Widgets.exec(cmd))
+
+// Partially update a record
+val cmd = update.id(newWidget.id).update(set("name" -> "foo2"), ...)
+db.Widgets.exec(cmd))
 
 // Delete a record
-val deleteQuery = BSONDocument("id" -> "some-id")
-db.Widgets.delete(deleteQuery)
+db.Widgets.exec(delete.model(newWidget))
+db.Widgets.exec(delete.id(newWidget.id))
 
 ```
 
