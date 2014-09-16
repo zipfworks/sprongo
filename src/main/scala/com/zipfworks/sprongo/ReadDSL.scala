@@ -5,13 +5,20 @@ import reactivemongo.bson._
 
 trait ReadDSL {
 
-  def read: ReadExpectsSelector = new ReadExpectsSelector()
+  def read: ReadExpectsSelector                = new ReadExpectsSelector()
+  def read(s: BSONDocument)                    = new ReadExpectsSelector().selector(s)
+  def read(s: Producer[(String, BSONValue)] *) = new ReadExpectsSelector().selector(s: _*)
 
   class ReadExpectsSelector {
 
     def selector(s: BSONDocument): ReadQuery = ReadQuery(s)
-    def ids(idList: String*)(implicit a: DummyImplicit): ReadQuery = ReadQuery(BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(idList.map(BSONString.apply)))))
-    def ids(idList: BSONValue*): ReadQuery = ReadQuery(BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(idList))))
+    def selector(s: Producer[(String, BSONValue)] *): ReadQuery = selector(BSONDocument(s: _*))
+
+    def ids(idList: String*)(implicit a: DummyImplicit): ReadQuery =
+      ReadQuery(BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(idList.map(BSONString.apply)))))
+
+    def ids(idList: BSONValue*): ReadQuery =
+      ReadQuery(BSONDocument("_id" -> BSONDocument("$in" -> BSONArray(idList))))
 
     def one(s: BSONDocument): ReadOneQuery =  ReadQuery(s).one
     def id(id: String): ReadOneQuery = ReadQuery(BSONDocument("_id" -> id)).one
@@ -23,16 +30,16 @@ trait ReadDSL {
   case class ReadQuery(
     sel: BSONDocument,
     sort: BSONDocument = BSONDocument(),
-    rp: ReadPreference = ReadPreference.nearest,
+    rp: ReadPreference = ReadPreference.secondaryPrefered,
     opts: QueryOpts = QueryOpts().slaveOk,
     limit: Option[Int] = None
   ){
-    def projection(fields: Producer[(String, BSONValue)]*): ReadProjectionQuery = {
+    def projection(fields: Producer[(String, BSONValue)]*): ReadProjectionQuery =
       ReadProjectionQuery(this, BSONDocument(fields: _*))
-    }
+
     def asBulk = ReadBulkQuery(this)
     def asList = ReadListQuery(this)
-    def one = ReadOneQuery(this)
+    def one    = ReadOneQuery(this)
 
     def sort(s: Producer[(String, BSONValue)]*): ReadQuery = this.copy(sort = BSONDocument(s: _*))
     def sort(s: BSONDocument): ReadQuery = this.copy(sort = s)
@@ -41,7 +48,9 @@ trait ReadDSL {
     def batchSize(i: Int): ReadQuery = this.copy(opts = opts.copy(batchSizeN = i))
     def limit(i: Int): ReadQuery = this.copy(limit = Some(i))
   }
+
   case class ReadBulkQuery(q: ReadQuery)
+
   case class ReadListQuery(q: ReadQuery)
 
   //projections
@@ -49,7 +58,9 @@ trait ReadDSL {
     def asList = ReadProjectionListQuery(this)
     def asBulk = ReadProjectionBulkQuery(this)
   }
+
   case class ReadProjectionBulkQuery(r: ReadProjectionQuery)
+
   case class ReadProjectionListQuery(r: ReadProjectionQuery)
 
   //read one
@@ -59,7 +70,6 @@ trait ReadDSL {
     def include(fields: String*): ReadOneProjectionQuery = ReadOneProjectionQuery(q, BSONDocument(fields.map(s => s -> BSONInteger(1))))
   }
 
-//  case class ReadOneProjectionQuery(q: ReadQuery, fields: Producer[(String, BSONValue)]*){
   case class ReadOneProjectionQuery(q: ReadQuery, projection: BSONDocument){
     def readPreference(readp: ReadPreference) = this.copy(q = q.readPreference(readp))
   }
