@@ -1,9 +1,8 @@
 package com.zipfworks.sprongo.macros
 
 import java.util.UUID
-
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONString, BSONHandler, BSONDateTime}
+import reactivemongo.bson._
 
 trait ExtendedMacroHandlers {
 
@@ -20,3 +19,5 @@ trait ExtendedMacroHandlers {
 }
 
 object ExtendedMacroHandlers extends ExtendedMacroHandlers
+
+

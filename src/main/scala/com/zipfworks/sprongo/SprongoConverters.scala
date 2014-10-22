@@ -21,6 +21,10 @@ trait SprongoConverters {
       }).flatten
     }
 
+    def collect[T](implicit f: BSONReader[BSONValue, T]): List[T] = {
+      arr.stream.toList.map(_.toOption).flatten.map(f.read)
+    }
+
     /**
      * Convert BSONArray to a spray.json.JsArray
      * @return JsArray

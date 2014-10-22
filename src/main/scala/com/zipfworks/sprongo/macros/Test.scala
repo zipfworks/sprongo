@@ -9,7 +9,6 @@ object Test {
 
   val dbURL = Seq("api1-dev.zipfcommerce.com")
   implicit val sys = ActorSystem("test")
-  import sys.dispatcher
 
   case class TestEntry(
     _id: BSONObjectID = BSONObjectID.generate,
@@ -29,16 +28,24 @@ object Test {
     object TestEntries extends MacroDAO[TestEntry]("foobar")
   }
 
-  def main (args: Array[String]) {
-    val doc = TestEntry(
-      string = "blah",
-      int = 0,
-      long = 1000000000,
-      dt = DateTime.now
+  def main (args: Array[String]): Unit = {
+    import sys.dispatcher
+    import InsertDSL._
+
+    //read.selector(BSONDocument("fdjask" -> "fdjasl", "fkdjsla" -> "fdjskal"))
+    //read.selector("fdsajkl" -> "fjdksla", "fdjskal" -> "fdljsalfj")
+
+
+    val model = Seq(
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
+      TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now)
     )
-    TestDB.TestEntries.find(BSONDocument("_id" -> BSONObjectID("54469594c41c00c41c134082"))).cursor[TestEntry].collect[List](1).map(list => {
-      println(list)
-    })
+
+    TestDB.TestEntries.execute(insert(model)).map(_ => println("done"))
   }
 
 }
