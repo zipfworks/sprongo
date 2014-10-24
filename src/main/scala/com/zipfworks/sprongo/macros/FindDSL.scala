@@ -12,17 +12,21 @@ trait FindDSL {
     selector: S,
     queryOpts: QueryOpts
   ){
-    def project[T2](projection: BSONDocument): FindOneQueryProjection[S, T2] = FindOneQueryProjection(
-      selector = selector,
-      queryOpts = queryOpts,
-      projection = projection
-    )
+    def project[T2](projection: BSONDocument): FindOneQueryProjection[S, T2] = {
+      FindOneQueryProjection(
+        selector = selector,
+        queryOpts = queryOpts,
+        projection = projection
+      )
+    }
 
-    def project[T2](projection: Producer[(String, BSONValue)]*): FindOneQueryProjection[S, T2] = FindOneQueryProjection(
-      selector = selector,
-      queryOpts = queryOpts,
-      projection = BSONDocument(projection: _*)
-    )
+    def project[T2](projection: Producer[(String, BSONValue)]*): FindOneQueryProjection[S, T2] = {
+      FindOneQueryProjection(
+        selector = selector,
+        queryOpts = queryOpts,
+        projection = BSONDocument(projection: _*)
+      )
+    }
   }
 
   case class FindOneQueryProjection[S, T2](
@@ -79,21 +83,27 @@ trait FindDSL {
     def exhaust: FindQuery[S] = this.copy(queryOpts = queryOpts.exhaust)
     def partial: FindQuery[S] = this.copy(queryOpts = queryOpts.partial)
 
-    def one: FindOneQuery[S] = FindOneQuery[S](selector = selector, queryOpts = queryOpts)
+    def one: FindOneQuery[S] = {
+      FindOneQuery[S](selector = selector, queryOpts = queryOpts)
+    }
 
-    def asBulk: FindBulkQuery[S] = FindBulkQuery[S](
-      selector = selector,
-      queryOpts = queryOpts,
-      limit = limit,
-      stopOnError = stopOnError
-    )
+    def asBulk: FindBulkQuery[S] = {
+      FindBulkQuery[S](
+        selector = selector,
+        queryOpts = queryOpts,
+        limit = limit,
+        stopOnError = stopOnError
+      )
+    }
 
-    def asList: FindListQuery[S] = FindListQuery[S](
-      selector = selector,
-      queryOpts = queryOpts,
-      limit = limit,
-      stopOnError = stopOnError
-    )
+    def asList: FindListQuery[S] = {
+      FindListQuery[S](
+        selector = selector,
+        queryOpts = queryOpts,
+        limit = limit,
+        stopOnError = stopOnError
+      )
+    }
 
 
   }
