@@ -73,7 +73,29 @@ trait FindDSL {
     stopOnError: Boolean
   ){
     def batchSize(i: Int): FindBulkQuery[S] = this.copy(queryOpts = queryOpts.batchSize(i))
+
+    def project[T2](projection: BSONDocument): FindBulkQueryProjection[S, T2] = {
+      FindBulkQueryProjection(
+        selector = selector,
+        queryOpts = queryOpts,
+        limit = limit,
+        stopOnError = stopOnError,
+        projection = projection
+      )
+    }
+
+    def project[T2](projection: Producer[(String, BSONValue)]*): FindBulkQueryProjection[S, T2] = {
+      project(BSONDocument(projection: _*))
+    }
   }
+
+  case class FindBulkQueryProjection[S, T2](
+    selector: S,
+    queryOpts: QueryOpts,
+    limit: Int,
+    stopOnError: Boolean,
+    projection: BSONDocument
+  )
 
   /**********************************************************************************
     *  Basic Find Queries
@@ -123,8 +145,34 @@ trait FindDSL {
       )
     }
 
+    def project[T2](projection: BSONDocument): FindQueryProjection[S, T2] = {
+      FindQueryProjection[S, T2](
+        selector = selector,
+        queryOpts = queryOpts,
+        limit = limit,
+        stopOnError = stopOnError,
+        projection = projection
+      )
+    }
 
+    def project[T2](projection: Producer[(String, BSONValue)]*): FindQueryProjection[S, T2] = {
+      project(BSONDocument(projection: _*))
+    }
   }
+
+
+  case class FindQueryProjection[S, T2](
+    selector: S,
+    queryOpts: QueryOpts,
+    limit: Int,
+    stopOnError: Boolean,
+    projection: BSONDocument
+  )
+
+  /**********************************************************************************
+    * DSL
+    *********************************************************************************/
+  def find[S](s: S): FindQuery[S] = FindQuery[S](selector = s)
 
 }
 
