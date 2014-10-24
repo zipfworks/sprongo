@@ -21,11 +21,7 @@ trait FindDSL {
     }
 
     def project[T2](projection: Producer[(String, BSONValue)]*): FindOneQueryProjection[S, T2] = {
-      FindOneQueryProjection(
-        selector = selector,
-        queryOpts = queryOpts,
-        projection = BSONDocument(projection: _*)
-      )
+      project(BSONDocument(projection: _*))
     }
   }
 
@@ -43,6 +39,28 @@ trait FindDSL {
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean
+  ){
+    def project[T2](projection: BSONDocument): FindListQueryProjection[S, T2] = {
+      FindListQueryProjection(
+        selector = selector,
+        queryOpts = queryOpts,
+        limit = limit,
+        stopOnError = stopOnError,
+        projection = projection
+      )
+    }
+
+    def project[T2](projection: Producer[(String, BSONValue)]*): FindListQueryProjection[S, T2] = {
+      project(BSONDocument(projection: _*))
+    }
+  }
+
+  case class FindListQueryProjection[S, T2](
+    selector: S,
+    queryOpts: QueryOpts,
+    limit: Int,
+    stopOnError: Boolean,
+    projection: BSONDocument
   )
 
   /**********************************************************************************

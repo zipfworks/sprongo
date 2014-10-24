@@ -40,15 +40,23 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   def execute[S](cmd: FindQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Enumerator[T] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T].enumerate(cmd.limit, cmd.stopOnError)
   }
+  //TODO: enumerator projection
 
   //return enumerator bulk
   def execute[S](cmd: FindBulkQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Enumerator[Iterator[T]] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T].enumerateBulks(cmd.limit, cmd.stopOnError)
   }
+  //TODO: enumerator bulk projection
+
 
   //return List[T]
   def execute[S](cmd: FindListQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[List[T]] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T].collect[List](cmd.limit, cmd.stopOnError)
+  }
+
+  def execute[S, T2](cmd: FindListQueryProjection[S, T2])
+                    (implicit selWriter: BSONDocumentWriter[S], proReader: BSONDocumentReader[T2]) = {
+    find(cmd.selector).options(cmd.queryOpts).cursor[T2].collect[List](cmd.limit, cmd.stopOnError)
   }
 
   //return one Option[T]
