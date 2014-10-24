@@ -32,10 +32,6 @@ object Test {
     import sys.dispatcher
     import InsertDSL._
 
-    //read.selector(BSONDocument("fdjask" -> "fdjasl", "fkdjsla" -> "fdjskal"))
-    //read.selector("fdsajkl" -> "fjdksla", "fdjskal" -> "fdljsalfj")
-
-
     val model = Seq(
       TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
       TestEntry(string = "test", int = 0, long = 100000, dt = DateTime.now),
