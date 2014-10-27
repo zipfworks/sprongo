@@ -4,9 +4,9 @@ sonatypeSettings
 
 name := "sprongo"
 
-version := "1.1.2-SNAPSHOT"
+version := "1.1.2.akka23-SNAPSHOT"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
@@ -29,7 +29,7 @@ publishArtifact in Test := true
 
 pomIncludeRepository := { _ => false }
 
-pomExtra := (
+pomExtra :=
   <url>https://github.com/zipfworks/sprongo</url>
   <licenses>
     <license>
@@ -58,7 +58,7 @@ pomExtra := (
       <url>https://github.com/dvliman</url>
      </developer>
   </developers>
-)
+
 
 resolvers := Seq(
   "sonatype-releases"   at "https://oss.sonatype.org/content/repositories/releases/",
@@ -69,7 +69,7 @@ resolvers := Seq(
 
 
 libraryDependencies ++= Seq(
-  "org.reactivemongo" %% "reactivemongo"   % "0.10.0",
+  "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
   "io.spray"          %%  "spray-json"     % "1.2.5",
   "joda-time"          % "joda-time"       % "2.3",
   "org.joda"           % "joda-convert"    % "1.5"
