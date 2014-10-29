@@ -1,6 +1,6 @@
 package com.zipfworks.sprongo.macros
 
-import reactivemongo.api.QueryOpts
+import reactivemongo.api.{ReadPreference, QueryOpts}
 import reactivemongo.bson.{Producer, BSONValue, BSONDocument}
 
 trait FindDSL {
@@ -10,11 +10,13 @@ trait FindDSL {
    *********************************************************************************/
   case class FindOneQuery[S](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts
   ){
     def project[T2](projection: BSONDocument): FindOneQueryProjection[S, T2] = {
       FindOneQueryProjection(
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         projection = projection
       )
@@ -27,6 +29,7 @@ trait FindDSL {
 
   case class FindOneQueryProjection[S, T2](
     selector: S,
+    readPreference: ReadPreference,
     projection: BSONDocument,
     queryOpts: QueryOpts
   )
@@ -36,6 +39,7 @@ trait FindDSL {
     *********************************************************************************/
   case class FindListQuery[S](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean
@@ -43,6 +47,7 @@ trait FindDSL {
     def project[T2](projection: BSONDocument): FindListQueryProjection[S, T2] = {
       FindListQueryProjection(
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         limit = limit,
         stopOnError = stopOnError,
@@ -57,6 +62,7 @@ trait FindDSL {
 
   case class FindListQueryProjection[S, T2](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean,
@@ -68,6 +74,7 @@ trait FindDSL {
     *********************************************************************************/
   case class FindBulkQuery[S](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean
@@ -77,6 +84,7 @@ trait FindDSL {
     def project[T2](projection: BSONDocument): FindBulkQueryProjection[S, T2] = {
       FindBulkQueryProjection(
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         limit = limit,
         stopOnError = stopOnError,
@@ -91,6 +99,7 @@ trait FindDSL {
 
   case class FindBulkQueryProjection[S, T2](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean,
@@ -102,10 +111,12 @@ trait FindDSL {
     *********************************************************************************/
   case class FindQuery[S](
     selector: S,
+    readPreference: ReadPreference = ReadPreference.secondaryPrefered,
     queryOpts: QueryOpts = QueryOpts().slaveOk,
     limit: Int = Int.MaxValue,
     stopOnError: Boolean = true
   ){
+    def readPreference(rp: ReadPreference): FindQuery[S] = this.copy(readPreference = rp)
     def queryOpts(qo: QueryOpts): FindQuery[S] = this.copy(queryOpts = qo)
     def limit(i: Int): FindQuery[S] = this.copy(limit = i)
     def stopOnError(b: Boolean): FindQuery[S] = this.copy(stopOnError = b)
@@ -124,12 +135,13 @@ trait FindDSL {
     def partial: FindQuery[S] = this.copy(queryOpts = queryOpts.partial)
 
     def one: FindOneQuery[S] = {
-      FindOneQuery[S](selector = selector, queryOpts = queryOpts)
+      FindOneQuery[S](selector = selector, readPreference = readPreference, queryOpts = queryOpts)
     }
 
     def asBulk: FindBulkQuery[S] = {
       FindBulkQuery[S](
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         limit = limit,
         stopOnError = stopOnError
@@ -139,6 +151,7 @@ trait FindDSL {
     def asList: FindListQuery[S] = {
       FindListQuery[S](
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         limit = limit,
         stopOnError = stopOnError
@@ -148,6 +161,7 @@ trait FindDSL {
     def project[T2](projection: BSONDocument): FindQueryProjection[S, T2] = {
       FindQueryProjection[S, T2](
         selector = selector,
+        readPreference = readPreference,
         queryOpts = queryOpts,
         limit = limit,
         stopOnError = stopOnError,
@@ -163,6 +177,7 @@ trait FindDSL {
 
   case class FindQueryProjection[S, T2](
     selector: S,
+    readPreference: ReadPreference,
     queryOpts: QueryOpts,
     limit: Int,
     stopOnError: Boolean,
