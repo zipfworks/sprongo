@@ -4,6 +4,8 @@ import com.zipfworks.sprongo.commands.Distinct
 import com.zipfworks.sprongo.macros.CommandDSL.{DistinctCommand, CountCommand}
 import com.zipfworks.sprongo.macros.FindDSL._
 import com.zipfworks.sprongo.macros.InsertDSL.{InsertModelsQuery, InsertModelQuery, InsertDocumentQuery, InsertQuery}
+import com.zipfworks.sprongo.macros.RemoveDSL.RemoveQuery
+import com.zipfworks.sprongo.macros.UpdateDSL.UpdateQuery
 import play.api.libs.iteratee.Enumerator
 import reactivemongo.api.{DefaultDB, FailoverStrategy}
 import reactivemongo.api.collections.default.BSONCollection
@@ -23,6 +25,16 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   /** Distinct Command **/
   def execute(distinctCMD: DistinctCommand): Future[BSONArray] =
     db.command(new Distinct(coll_name, distinctCMD.field, distinctCMD.selector))
+
+  /** Remove Documents **/
+  def execute[S](removeCMD: RemoveQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[LastError] = {
+    remove[S](removeCMD.selector, removeCMD.writeConcern, removeCMD.multi)
+  }
+
+  /** Update Documents **/
+  def execute[S](updateCMD: UpdateQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[LastError] = {
+    update[S, BSONDocument](updateCMD.selector, updateCMD.update, updateCMD.writeConcern, updateCMD.upsert, updateCMD.multi)
+  }
 
   /** Insert Single Document **/
   def execute(insertCMD: InsertQuery): Future[LastError] = insertCMD match {
