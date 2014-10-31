@@ -8,11 +8,11 @@ version := "1.1.2.akka23-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
+crossScalaVersions := Seq("2.10.4", "2.11.2")
+
 scalacOptions ++= Seq("-feature", "-deprecation")
 
 organization := "com.zipfworks"
-
-credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
 publishTo <<= (version) { version: String =>
   val nexus = "https://oss.sonatype.org/"
@@ -70,7 +70,7 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
-  "io.spray"          %%  "spray-json"     % "1.2.5",
+  "io.spray"          %%  "spray-json"     % "1.3.1",
   "joda-time"          % "joda-time"       % "2.3",
   "org.joda"           % "joda-convert"    % "1.5"
 )

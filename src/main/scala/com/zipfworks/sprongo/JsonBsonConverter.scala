@@ -3,25 +3,22 @@ package com.zipfworks.sprongo
 import reactivemongo.bson._
 import spray.json._
 import scala.util.{Failure, Success}
+import SprongoConverters._
 
 object JsonBsonConverter {
 
   def bsonValueToJsValue(bval: BSONValue): JsValue = {
     bval match {
-      case _: BSONString => JsString(bval.asInstanceOf[BSONString].value)
-      case _: BSONLong => JsNumber(bval.asInstanceOf[BSONLong].value)
-      case _: BSONDouble => JsNumber(bval.asInstanceOf[BSONDouble].value)
-      case _: BSONInteger => JsNumber(bval.asInstanceOf[BSONInteger].value)
-      case _: BSONBoolean => JsBoolean(bval.asInstanceOf[BSONBoolean].value)
-      case _: BSONArray => JsArray(
-        bval.asInstanceOf[BSONArray].stream.flatMap({
-          case Success(v) => Some(v)
-          case Failure(v) => None
-        }).map(v => bsonValueToJsValue(v)).toList)
-      case _: BSONDocument => bdocToJsObject(bval.asInstanceOf[BSONDocument])
-      case _: BSONNull.type => JsNull
-      case _: BSONUndefined.type => JsNull
-      case _ =>
+      case v: BSONString    => JsString(v.value)
+      case v: BSONLong      => JsNumber(v.value)
+      case v: BSONDouble    => JsNumber(v.value)
+      case v: BSONInteger   => JsNumber(v.value)
+      case v: BSONBoolean   => JsBoolean(v.value)
+      case v: BSONArray     => JsArray(v.collect(b => bsonValueToJsValue(b)): _*)
+      case v: BSONDocument  => bdocToJsObject(v)
+      case v: BSONNull.type => JsNull
+      case v: BSONUndefined.type => JsNull
+      case v =>
         println(bval.getClass)
         JsString(bval.getClass.toString)
     }
@@ -38,18 +35,18 @@ object JsonBsonConverter {
 
   def jsValueToBsonVal(jsVal: JsValue): BSONValue = {
     jsVal match {
-      case _: JsString => BSONString(jsVal.asInstanceOf[JsString].value)
-      case _: JsNumber => jsVal.asInstanceOf[JsNumber].value match {
-        case num if num.isValidLong => BSONLong(num.toLong)
+      case v: JsString => BSONString(v.value)
+      case v: JsNumber => v.value match {
+        case num if num.isValidLong   => BSONLong(num.toLong)
         case num if num.isValidDouble => BSONDouble(num.toDouble)
-        case num if num.isValidInt => BSONInteger(num.toInt)
-        case num if num.isValidFloat => BSONDouble(num.toFloat)
-        case num if num.isValidShort => BSONInteger(num.toShortExact)
+        case num if num.isValidInt    => BSONInteger(num.toInt)
+        case num if num.isValidFloat  => BSONDouble(num.toFloat)
+        case num if num.isValidShort  => BSONInteger(num.toShortExact)
         case num => BSONDouble(num.toDouble)}
-      case _: JsBoolean => BSONBoolean(jsVal.asInstanceOf[JsBoolean].value)
-      case _: JsArray => jsVal.asInstanceOf[JsArray].elements.foldLeft(BSONArray())((arr, jsval) => arr.add(jsValueToBsonVal(jsval)))
-      case _: JsObject => jsObjToBdoc(jsVal.asJsObject)
-      case _: JsNull.type => BSONNull
+      case v: JsBoolean   => BSONBoolean(v.value)
+      case v: JsArray     => BSONArray(v.elements.map(jsValueToBsonVal))
+      case v: JsObject    => jsObjToBdoc(v)
+      case v: JsNull.type => BSONNull
     }
   }
 

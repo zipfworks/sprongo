@@ -60,7 +60,7 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
   }
 
   def exec(c: CreateBulkQuery[M]): Future[Int] = {
-    collection.bulkInsert(Enumerator.enumerate(c.ds), c.bulkSize, c.bulkByteSize)
+    collection.bulkInsert(Enumerator.enumerate(c.ds), bulkSize = c.bulkSize, bulkByteSize = c.bulkByteSize)
   }
 
   /**********************************************************************************

@@ -35,7 +35,7 @@ trait SprongoConverters {
         case Failure(_) => None
       }).flatten
 
-      JsArray(convertedArray)
+      JsArray(convertedArray: _*)
     }
 
 
