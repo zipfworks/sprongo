@@ -72,7 +72,8 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
   "io.spray"          %%  "spray-json"     % "1.3.1",
   "joda-time"          % "joda-time"       % "2.3",
-  "org.joda"           % "joda-convert"    % "1.5"
+  "org.joda"           % "joda-convert"    % "1.5",
+  "org.specs2"        %% "specs2-core"     % "2.4.9" % "test"
 )
 
 org.scalastyle.sbt.ScalastylePlugin.Settings

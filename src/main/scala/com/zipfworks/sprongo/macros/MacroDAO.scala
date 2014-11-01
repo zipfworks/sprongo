@@ -37,9 +37,12 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   }
 
   /** Insert Single Document **/
-  def execute(insertCMD: InsertQuery): Future[LastError] = insertCMD match {
-    case cmd: InsertDocumentQuery => insert(cmd.document, cmd.writeConcern)
-    case cmd: InsertModelQuery[T] => insert(cmd.model, cmd.writeConcern)
+  def execute(insertCMD: InsertDocumentQuery): Future[LastError] = {
+    insert(insertCMD.document, insertCMD.writeConcern)
+  }
+
+  def execute(insertCMD: InsertModelQuery[T]): Future[LastError] = {
+    insert(insertCMD.model, insertCMD.writeConcern)
   }
 
   /** Bulk Insert Documents **/
