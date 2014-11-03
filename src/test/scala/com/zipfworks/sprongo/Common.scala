@@ -1,9 +1,9 @@
 package com.zipfworks.sprongo
 
 import akka.actor.ActorSystem
-import com.zipfworks.sprongo.macros.{ExtendedMacroHandlers, MacroDAO, MacroDB}
+import com.zipfworks.sprongo.macros._
 import org.joda.time.DateTime
-import reactivemongo.bson.{Macros, BSONObjectID}
+import reactivemongo.bson.{BSONDocument, Macros, BSONObjectID}
 
 object Common extends ExtendedMacroHandlers {
   import scala.concurrent.duration._
@@ -16,10 +16,13 @@ object Common extends ExtendedMacroHandlers {
     long: Long,
     datetime: DateTime,
     _id: BSONObjectID = BSONObjectID.generate
-  )
+  ) extends ObjectIDModel
 
   object TestEntry {
     implicit val handler = Macros.handler[TestEntry]
+//    implicit case object selWriter extends SelWriter[TestEntry] {
+//      override def write(t: TestEntry): BSONDocument = BSONDocument("_id" -> t._id)
+//    }
   }
 
   implicit lazy val system = ActorSystem()

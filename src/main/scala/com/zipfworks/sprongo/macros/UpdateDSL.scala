@@ -5,24 +5,24 @@ import reactivemongo.core.commands.GetLastError
 
 trait UpdateDSL {
 
-  case class UpdateQuery[S](
-    selector: S,
+  case class UpdateQuery(
+    selector: BSONDocument,
     update: BSONDocument,
     writeConcern: GetLastError = GetLastError(),
     upsert: Boolean = false,
     multi: Boolean = false
   ){
-    def writeConcern(wr: GetLastError): UpdateQuery[S] = this.copy(writeConcern = wr)
-    def upsert(b: Boolean): UpdateQuery[S] = this.copy(upsert = b)
-    def multi(b: Boolean): UpdateQuery[S] = this.copy(multi = b)
+    def writeConcern(wr: GetLastError): UpdateQuery = this.copy(writeConcern = wr)
+    def upsert(b: Boolean): UpdateQuery = this.copy(upsert = b)
+    def multi(b: Boolean): UpdateQuery = this.copy(multi = b)
   }
 
   /** Intermediary Step to assign updates **/
-  class UpdateExpectsUpdateOps[S](selector: S){
-    def ops(ops: UpdateOps*): UpdateQuery[S] =
+  class UpdateExpectsUpdateOps(selector: BSONDocument){
+    def ops(ops: UpdateOps*): UpdateQuery =
       UpdateQuery(selector, BSONDocument(ops.map(_.build)))
 
-    def ops(update: BSONDocument): UpdateQuery[S] =
+    def ops(update: BSONDocument): UpdateQuery =
       UpdateQuery(selector, update)
   }
 
@@ -71,8 +71,21 @@ trait UpdateDSL {
   }
 
   /** DSL **/
-  def update[S](selector: S) = new UpdateExpectsUpdateOps[S](selector)
+  //update("some-id"); update(BSONObjectId("some-id"))
+  def update[S](selector: S)(implicit selWriter: SelWriter[S]) =
+    new UpdateExpectsUpdateOps(selWriter.write(selector))
 
+  //update(MyCaseClassModel("cool!"))
+  def update[A <: ModelSelWriter](selector: A) =
+    new UpdateExpectsUpdateOps(selector = selector.write)
+
+  //update("key" -> "value", "key2" -> "value2")
+  def update(selector: Producer[(String, BSONValue)]*) =
+    new UpdateExpectsUpdateOps(selector = BSONDocument(selector: _*))
+
+  //update("key" -> "value")
+  def update[B](selector: (String, B))(implicit writer: BSONWriter[B, _ <: BSONValue]) =
+    new UpdateExpectsUpdateOps(selector = BSONDocument(Producer.nameValue2Producer(selector)))
 }
 
 object UpdateDSL extends UpdateDSL

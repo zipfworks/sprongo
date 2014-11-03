@@ -27,13 +27,13 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
     db.command(new Distinct(coll_name, distinctCMD.field, distinctCMD.selector))
 
   /** Remove Documents **/
-  def execute[S](removeCMD: RemoveQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[LastError] = {
-    remove[S](removeCMD.selector, removeCMD.writeConcern, removeCMD.multi)
+  def execute[S](removeCMD: RemoveQuery): Future[LastError] = {
+    remove(removeCMD.selector, removeCMD.writeConcern, !removeCMD.multi)
   }
 
   /** Update Documents **/
-  def execute[S](updateCMD: UpdateQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[LastError] = {
-    update[S, BSONDocument](updateCMD.selector, updateCMD.update, updateCMD.writeConcern, updateCMD.upsert, updateCMD.multi)
+  def execute(updateCMD: UpdateQuery): Future[LastError] = {
+    update(updateCMD.selector, updateCMD.update, updateCMD.writeConcern, updateCMD.upsert, updateCMD.multi)
   }
 
   /** Insert Single Document **/
@@ -62,7 +62,8 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   }
 
   //return enumerator bulk
-  def execute[S](cmd: FindBulkQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Enumerator[Iterator[T]] = {
+  def execute[S](cmd: FindBulkQuery[S])
+                (implicit selWriter: BSONDocumentWriter[S]): Enumerator[Iterator[T]] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).enumerateBulks(cmd.limit, cmd.stopOnError)
   }
 
@@ -72,7 +73,8 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   }
 
   //return List[T]
-  def execute[S](cmd: FindListQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[List[T]] = {
+  def execute[S](cmd: FindListQuery[S])
+                (implicit selWriter: BSONDocumentWriter[S]): Future[List[T]] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).collect[List](cmd.limit, cmd.stopOnError)
   }
 
@@ -82,7 +84,8 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
   }
 
   //return one Option[T]
-  def execute[S](cmd: FindOneQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Future[Option[T]] = {
+  def execute[S](cmd: FindOneQuery[S])
+                (implicit selWriter: BSONDocumentWriter[S]): Future[Option[T]] = {
     find(cmd.selector).options(cmd.queryOpts).one[T](cmd.readPreference)
   }
 
