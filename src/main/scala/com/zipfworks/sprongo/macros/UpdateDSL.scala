@@ -31,8 +31,8 @@ trait UpdateDSL {
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/set/ **/
-  case class $set[T](field: String, value: T)(implicit writer: BSONWriter[T, BSONValue]) extends UpdateOps {
-    override def build: (String, BSONValue) = "$set" -> BSONDocument(field -> writer.write(value))
+  case class $set[T](field: String, value: T)(implicit writer: BSONWriter[T, _ <: BSONValue]) extends UpdateOps {
+    override def build: (String, BSONValue) = "$set" -> BSONDocument(Producer.nameValue2Producer(field -> value))
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/unset/ **/
@@ -46,18 +46,18 @@ trait UpdateDSL {
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/push/#up._S_push **/
-  case class $push[S](field: String, value: S)(implicit writer: BSONWriter[S, BSONValue]) extends UpdateOps {
-    override def build: (String, BSONValue) = "$push" -> BSONDocument(field -> writer.write(value))
+  case class $push[S](field: String, value: S)(implicit writer: BSONWriter[S, _ <: BSONValue]) extends UpdateOps {
+    override def build: (String, BSONValue) = "$push" -> BSONDocument(Producer.nameValue2Producer(field -> value))
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/pull/#up._S_pull **/
-  case class $pull[S](field: String, value: S)(implicit writer: BSONWriter[S, BSONValue]) extends UpdateOps {
-    override def build: (String, BSONValue) = "$pull" -> BSONDocument(field -> writer.write(value))
+  case class $pull[S](field: String, value: S)(implicit writer: BSONWriter[S, _ <: BSONValue]) extends UpdateOps {
+    override def build: (String, BSONValue) = "$pull" -> BSONDocument(Producer.nameValue2Producer(field -> value))
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/addToSet/ **/
-  case class $addToSet[S](field: String, value: S)(implicit writer: BSONWriter[S, BSONValue]) extends UpdateOps {
-    override def build: (String, BSONValue) = "$addToSet" -> BSONDocument(field -> writer.write(value))
+  case class $addToSet[S](field: String, value: S)(implicit writer: BSONWriter[S, _ <: BSONValue]) extends UpdateOps {
+    override def build: (String, BSONValue) = "$addToSet" -> BSONDocument(Producer.nameValue2Producer(field -> value))
   }
 
   /** http://docs.mongodb.org/manual/reference/operator/update/pop/ **/
