@@ -1,6 +1,6 @@
 package com.zipfworks.sprongo
 
-import com.zipfworks.sprongo.macros.InsertDSL._
+import com.zipfworks.sprongo.macros.SprongoDSL._
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import reactivemongo.bson.BSONDocument

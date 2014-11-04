@@ -1,5 +1,7 @@
 package com.zipfworks.sprongo
 
+import java.util.UUID
+
 import reactivemongo.bson.{BSONDateTime, BSONObjectID}
 import spray.json._
 import org.joda.time.DateTime
@@ -7,9 +9,14 @@ import reactivemongo.api.SortOrder
 
 trait ExtendedJsonProtocol extends DefaultJsonProtocol {
 
+  implicit object UUIDFormat extends RootJsonFormat[UUID] {
+    override def write(obj: UUID): JsValue = JsString(obj.toString)
+    override def read(json: JsValue): UUID = UUID.fromString(json.asInstanceOf[JsString].value)
+  }
+
   implicit object DateTimeJsonFormat extends RootJsonFormat[DateTime] {
-    def write(dt: DateTime) = JsNumber(dt.getMillis)
-    def read(value: JsValue) = new DateTime(value.asInstanceOf[JsNumber].value.toLong)
+    def write(dt: DateTime) = JsString(dt.toString())
+    def read(value: JsValue) = DateTime.parse(value.asInstanceOf[JsString].value)
   }
 
   implicit object BSONDateTimeJsonFormat extends RootJsonFormat[BSONDateTime] {
@@ -38,3 +45,5 @@ trait ExtendedJsonProtocol extends DefaultJsonProtocol {
 }
 
 object ExtendedJsonProtocol extends ExtendedJsonProtocol
+
+

@@ -2,7 +2,7 @@ package com.zipfworks.sprongo
 
 import org.specs2.mutable.Specification
 import reactivemongo.bson._
-import com.zipfworks.sprongo.macros.UpdateDSL._
+import com.zipfworks.sprongo.macros.SprongoDSL._
 
 import scala.concurrent.Await
 

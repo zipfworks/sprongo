@@ -2,10 +2,7 @@ package com.zipfworks.sprongo.macros
 
 import com.zipfworks.sprongo.commands.Distinct
 import com.zipfworks.sprongo.macros.CommandDSL.{DistinctCommand, CountCommand}
-import com.zipfworks.sprongo.macros.FindDSL._
-import com.zipfworks.sprongo.macros.InsertDSL.{InsertModelsQuery, InsertModelQuery, InsertDocumentQuery, InsertQuery}
-import com.zipfworks.sprongo.macros.RemoveDSL.RemoveQuery
-import com.zipfworks.sprongo.macros.UpdateDSL.UpdateQuery
+import SprongoDSL._
 import play.api.libs.iteratee.Enumerator
 import reactivemongo.api.{DefaultDB, FailoverStrategy}
 import reactivemongo.api.collections.default.BSONCollection
