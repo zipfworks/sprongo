@@ -1,14 +1,12 @@
 package com.zipfworks.sprongo.macros
 
 import com.zipfworks.sprongo.commands.Distinct
-import com.zipfworks.sprongo.macros.CommandDSL.{DistinctCommand, CountCommand}
 import SprongoDSL._
 import play.api.libs.iteratee.Enumerator
 import reactivemongo.api.{DefaultDB, FailoverStrategy}
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson._
 import reactivemongo.core.commands.{LastError, Count}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumentWriter[T],
