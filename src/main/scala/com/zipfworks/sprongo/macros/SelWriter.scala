@@ -1,5 +1,6 @@
 package com.zipfworks.sprongo.macros
 
+import java.util.UUID
 import reactivemongo.bson._
 import Producer._
 
@@ -22,6 +23,10 @@ object SelWriters {
 
   implicit case object StringSelWriter extends SelWriter[String] {
     override def write(t: String): BSONDocument = BSONDocument("_id" -> BSONString(t))
+  }
+
+  implicit case object UUIDSelWriter extends SelWriter[UUID] {
+    override def write(t: UUID): BSONDocument = BSONDocument("_id" -> BSONString(t.toString))
   }
 
   implicit case object ObjectIDWriter extends SelWriter[BSONObjectID] {
