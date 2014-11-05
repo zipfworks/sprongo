@@ -6,7 +6,7 @@ name := "sprongo"
 
 version := "1.1.2.akka23-SNAPSHOT"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.2"
 
 crossScalaVersions := Seq("2.10.4", "2.11.2")
 

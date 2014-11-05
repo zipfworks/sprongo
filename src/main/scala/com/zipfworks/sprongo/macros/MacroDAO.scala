@@ -47,45 +47,38 @@ class MacroDAO[T](coll_name: String)(implicit db: DefaultDB, writer: BSONDocumen
 
   /** Find Documents **/
   //return enumerator
-  def execute[S](cmd: FindQuery[S])(implicit selWriter: BSONDocumentWriter[S]): Enumerator[T] = {
+  def execute(cmd: FindQuery): Enumerator[T] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).enumerate(cmd.limit, cmd.stopOnError)
   }
 
-  def execute[S, T2](cmd: FindQueryProjection[S, T2])
-                    (implicit selWriter: BSONDocumentWriter[S], proReader: BSONDocumentReader[T2]) = {
+  def execute[T2](cmd: FindQueryProjection[T2])(implicit proReader: BSONDocumentReader[T2]) = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T2](cmd.readPreference).enumerate(cmd.limit, cmd.stopOnError)
   }
 
   //return enumerator bulk
-  def execute[S](cmd: FindBulkQuery[S])
-                (implicit selWriter: BSONDocumentWriter[S]): Enumerator[Iterator[T]] = {
+  def execute(cmd: FindBulkQuery): Enumerator[Iterator[T]] = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).enumerateBulks(cmd.limit, cmd.stopOnError)
   }
 
-  def execute[S, T2](cmd: FindBulkQueryProjection[S, T2])
-                    (implicit selWriter: BSONDocumentWriter[S], proReader: BSONDocumentReader[T2]) = {
+  def execute[T2](cmd: FindBulkQueryProjection[T2])(implicit proReader: BSONDocumentReader[T2]) = {
     find(cmd.selector).options(cmd.queryOpts).cursor[T2](cmd.readPreference).enumerateBulks(cmd.limit, cmd.stopOnError)
   }
 
-  //return List[T]
-  def execute[S](cmd: FindListQuery[S])
-                (implicit selWriter: BSONDocumentWriter[S]): Future[List[T]] = {
-    find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).collect[List](cmd.limit, cmd.stopOnError)
+  //return Seq[T]
+  def execute(cmd: FindListQuery): Future[Seq[T]] = {
+    find(cmd.selector).options(cmd.queryOpts).cursor[T](cmd.readPreference).collect[Seq](cmd.limit, cmd.stopOnError)
   }
 
-  def execute[S, T2](cmd: FindListQueryProjection[S, T2])
-                    (implicit selWriter: BSONDocumentWriter[S], proReader: BSONDocumentReader[T2]) = {
-    find(cmd.selector).options(cmd.queryOpts).cursor[T2](cmd.readPreference).collect[List](cmd.limit, cmd.stopOnError)
+  def execute[T2](cmd: FindListQueryProjection[T2])(implicit proReader: BSONDocumentReader[T2]) = {
+    find(cmd.selector).options(cmd.queryOpts).cursor[T2](cmd.readPreference).collect[Seq](cmd.limit, cmd.stopOnError)
   }
 
   //return one Option[T]
-  def execute[S](cmd: FindOneQuery[S])
-                (implicit selWriter: BSONDocumentWriter[S]): Future[Option[T]] = {
+  def execute(cmd: FindOneQuery): Future[Option[T]] = {
     find(cmd.selector).options(cmd.queryOpts).one[T](cmd.readPreference)
   }
 
-  def execute[S, T2](cmd: FindOneQueryProjection[S, T2])
-                    (implicit selWriter: BSONDocumentWriter[S], proReader: BSONDocumentReader[T2]) = {
+  def execute[T2](cmd: FindOneQueryProjection[T2])(implicit proReader: BSONDocumentReader[T2]) = {
     find(cmd.selector).options(cmd.queryOpts).one[T2](cmd.readPreference)
   }
 
