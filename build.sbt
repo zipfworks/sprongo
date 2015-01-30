@@ -4,7 +4,7 @@ sonatypeSettings
 
 name := "sprongo"
 
-version := "1.1.2-SNAPSHOT"
+version := "1.1.2"
 
 scalaVersion := "2.10.3"
 
