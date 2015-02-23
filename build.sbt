@@ -4,7 +4,7 @@ sonatypeSettings
 
 name := "sprongo"
 
-version := "1.1.2"
+version := "1.2.0-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
@@ -77,7 +77,7 @@ resolvers := Seq(
 
 
 libraryDependencies ++= Seq(
-  "org.reactivemongo" %% "reactivemongo"   % "0.10.0",
+  "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
   "io.spray"          %%  "spray-json"     % "1.2.5",
   "joda-time"          % "joda-time"       % "2.3",
   "org.joda"           % "joda-convert"    % "1.5"
