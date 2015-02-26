@@ -17,7 +17,7 @@ object JsonBsonConverter {
         bval.asInstanceOf[BSONArray].stream.flatMap({
           case Success(v) => Some(v)
           case Failure(v) => None
-        }).map(v => bsonValueToJsValue(v)).toList)
+        }).map(v => bsonValueToJsValue(v)).toVector)
       case _: BSONDocument => bdocToJsObject(bval.asInstanceOf[BSONDocument])
       case _: BSONNull.type => JsNull
       case _: BSONUndefined.type => JsNull
