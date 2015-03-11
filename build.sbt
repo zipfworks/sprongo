@@ -6,9 +6,9 @@ name := "sprongo"
 
 version := "2.0.0-SNAPSHOT"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.5"
 
-crossScalaVersions := Seq("2.11.5")
+crossScalaVersions := Seq("2.11.5", "2.10.4")
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
