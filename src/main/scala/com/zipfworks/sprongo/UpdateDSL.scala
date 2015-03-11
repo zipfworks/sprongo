@@ -1,33 +1,26 @@
 package com.zipfworks.sprongo
 
 import reactivemongo.bson.{BSONInteger, Producer, BSONValue, BSONDocument}
+import reactivemongo.core.commands.GetLastError
 import spray.json._
+
+case class UpdateQuery(
+  selector: BSONDocument,
+  update: BSONDocument,
+  upsert: Boolean = false,
+  multi: Boolean = false,
+  writeConcern: GetLastError = GetLastError()
+){
+  def upsert(b: Boolean): UpdateQuery = this.copy(upsert = b)
+  def multi(b: Boolean): UpdateQuery = this.copy(multi = b)
+  def writeConcern(gle: GetLastError): UpdateQuery = this.copy(writeConcern = gle)
+}
 
 trait UpdateDSL {
 
-  def update = new UpdateExpectsSelector()
-
-  case class UpdateQuery(
-                          selector: BSONDocument,
-                          update: BSONDocument,
-                          upsert: Boolean = false,
-                          multi: Boolean = false
-                          ){
-    def upsert(b: Boolean): UpdateQuery = this.copy(upsert = b)
-    def multi(b: Boolean): UpdateQuery = this.copy(multi = b)
-  }
-
-  case class UpdateModelQuery[T](m: T, upsert: Boolean = false, multi: Boolean = false){
-    def upsert(b: Boolean): UpdateModelQuery[T] = this.copy(upsert = b)
-    def multi(b: Boolean): UpdateModelQuery[T] = this.copy(multi = b)
-  }
-
   class UpdateExpectsSelector {
-
-    def selector(s: BSONDocument)                    = new UpdateExpectsUpdateDef(s)
-    def selector(s: Producer[(String, BSONValue)] *) = new UpdateExpectsUpdateDef(BSONDocument(s: _*))
-
-    def model[T <: Model](m: T) = UpdateModelQuery[T](m)
+    def selector(s: BSONDocument)                   = new UpdateExpectsUpdateDef(s)
+    def selector(s: Producer[(String, BSONValue)]*) = new UpdateExpectsUpdateDef(BSONDocument(s: _*))
 
     def id(id: String)    = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
     def id(id: BSONValue) = new UpdateExpectsUpdateDef(BSONDocument("_id" -> id))
@@ -39,6 +32,8 @@ trait UpdateDSL {
       UpdateQuery(s, ups)
     }
   }
+
+  def update = new UpdateExpectsSelector()
 
   /**********************************************************************************
    * Update Operations

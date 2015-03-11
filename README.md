@@ -3,6 +3,19 @@
 Sprongo provides [ReactiveMongo](http://reactivemongo.org/) integration
 with [Spray](http://spray.io/) which makes building a REST API easier.
 
+##You are currently on an EXPERIMENTAL branch
+**!!!Beware!!!** The contents of this branch is purely experimental and may or may not see the light of day.
+
+**Purpose:** Current Sprong makes (by default) 10 connections to a mongo instance for EVERY database you define.
+This is kind inefficient since you'll almost never need that many connections to a mongo instance.  This branch
+tries to unify all the databases connections into one SprongConnector.  SprongoDatabase will be the new database
+instance and SprongoCollection will live inside the Database.
+
+**TODOs:**
+- prepend all the updateOps with a '$' so it looks more like mongo's commands
+- create a read-only SprongoCollection
+- completely refactor the read queries because that is just ridiculous...
+
 ## Building the Library ##
 
 To use Sprongo, you'll need to build the project and publish it locally

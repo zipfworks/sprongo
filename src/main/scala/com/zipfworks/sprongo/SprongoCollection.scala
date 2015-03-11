@@ -52,16 +52,15 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
   /**********************************************************************************
     * Update Document
     *********************************************************************************/
-  //TODO
-  def exec(u: UpdateQuery): Future[LastError] = {
+  def exec(query: UpdateQuery): Future[LastError] = {
     collection.update(
-      selector = u.selector,
-      update = u.update,
-      upsert = u.upsert,
-      multi = u.multi)
+      selector = query.selector,
+      update = query.update,
+      upsert = query.upsert,
+      multi = query.multi,
+      writeConcern = query.writeConcern
+    )
   }
-
-//  def exec[M](u: UpdateModelQuery[M])(implicit writer: BSONDocumentWriter[M]): Future[LastError]
 
   /**********************************************************************************
     * Delete Document
