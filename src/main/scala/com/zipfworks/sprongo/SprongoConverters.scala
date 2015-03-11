@@ -71,6 +71,13 @@ trait SprongoConverters {
     def asJsObject =
       JsonBsonConverter.bdocToJsObject(doc)
 
+    /**
+     * Convert this BSONDocument into a Map[String, JsValue]
+     * @return Map[String, JsValue]
+     */
+    def asMap =
+      asJsObject.fields
+
   }
 
 }
