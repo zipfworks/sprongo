@@ -2,15 +2,14 @@ package com.zipfworks.sprongo
 
 import com.zipfworks.sprongo.commands.Distinct
 import play.api.libs.iteratee.Enumerator
-import reactivemongo.api.Cursor
-import reactivemongo.api.{FailoverStrategy, DB}
+import reactivemongo.api.{Cursor, FailoverStrategy, DB}
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson._
 import reactivemongo.core.commands.{LastError, Count}
 import scala.concurrent.{ExecutionContext, Future}
 import SprongoDSL._
 
-class SprongoCollection(database: DB, collName: String, failover: FailoverStrategy)
+class SprongoCollection(database: DB, collName: String, failover: FailoverStrategy = FailoverStrategy())
   extends BSONCollection(database, collName, failover) {
 
   implicit private val ec: ExecutionContext = database.connection.actorSystem.dispatcher
@@ -19,16 +18,12 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
   /**********************************************************************************
     * Count Command
     *********************************************************************************/
-  def count[T](query: T = BSONDocument())(implicit writer: BSONDocumentWriter[T]): Future[Int] = {
-    db.command(new Count(collName, Some(writer.write(query))))
-  }
-
-  def count(query: Producer[(String, BSONValue)]*): Future[Int] = {
-    count(BSONDocument(query: _*))
+  def exec[T](query: CountQuery[T])(implicit writer: BSONDocumentWriter[T]): Future[Int] = {
+    db.command(new Count(collName, Some(writer.write(query.selector))))
   }
 
   /**********************************************************************************
-    * Distinct Command
+    * Distinct Command - Eventually move to Dsl so we can pass in readPref
     *********************************************************************************/
   def distinct[T](field: String, query: T = BSONDocument())(implicit writer: BSONDocumentWriter[T]): Future[BSONArray] = {
     db.command(new Distinct(collName, field, Some(writer.write(query))))
