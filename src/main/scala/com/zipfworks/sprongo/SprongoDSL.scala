@@ -5,3 +5,5 @@ object SprongoDSL
   with DeleteDSL
   with ReadDSL
   with CreateDSL
+  with CountDsl
+  with DistictDsl

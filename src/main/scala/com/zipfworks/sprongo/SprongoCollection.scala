@@ -9,7 +9,8 @@ import reactivemongo.core.commands.{LastError, Count}
 import scala.concurrent.{ExecutionContext, Future}
 import SprongoDSL._
 
-class SprongoCollection(database: DB, collName: String, failover: FailoverStrategy = FailoverStrategy())
+class SprongoCollection[M](database: DB, collName: String, failover: FailoverStrategy = FailoverStrategy())
+                          (implicit reader: BSONDocumentReader[M], writer: BSONDocumentWriter[M])
   extends BSONCollection(database, collName, failover) {
 
   implicit private val ec: ExecutionContext = database.connection.actorSystem.dispatcher
@@ -76,7 +77,7 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
   /**********************************************************************************
     * Reads
     *********************************************************************************/
-  private def getCursor[M](r: ReadQuery)(implicit reader: BSONDocumentReader[M]): Cursor[M] = {
+  private def getCursor(r: ReadQuery): Cursor[M] = {
     collection
       .find(r.sel)
       .sort(r.sort)
@@ -92,18 +93,18 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
       .cursor[BSONDocument](r.q.rp)
   }
 
-  def exec[M](r: ReadQuery)(implicit reader: BSONDocumentReader[M]): Enumerator[M] = {
-    val cursor = getCursor[M](r)
+  def exec(r: ReadQuery): Enumerator[M] = {
+    val cursor = getCursor(r)
     r.limit match {
       case None    => cursor.enumerate()
       case Some(l) => cursor.enumerate(maxDocs = l)
     }
   }
 
-  def exec[M](r: ReadBulkQuery)(implicit reader: BSONDocumentReader[M]): Enumerator[Iterator[M]] = {
+  def exec(r: ReadBulkQuery): Enumerator[Iterator[M]] = {
     r.q.limit match {
-      case None    => getCursor[M](r.q).enumerateBulks()
-      case Some(l) => getCursor[M](r.q).enumerateBulks(maxDocs = l)
+      case None    => getCursor(r.q).enumerateBulks()
+      case Some(l) => getCursor(r.q).enumerateBulks(maxDocs = l)
     }
   }
 
@@ -128,15 +129,15 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
     }
   }
 
-  def exec[M](r: ReadListQuery)(implicit reader: BSONDocumentReader[M]): Future[List[M]] = {
-    val cursor = getCursor[M](r.q)
+  def exec(r: ReadListQuery): Future[List[M]] = {
+    val cursor = getCursor(r.q)
     r.q.limit match {
       case None    => cursor.collect[List]()
       case Some(l) => cursor.collect[List](upTo = l)
     }
   }
 
-  def exec[M](r: ReadOneQuery)(implicit reader: BSONDocumentReader[M]): Future[Option[M]] = {
+  def exec(r: ReadOneQuery): Future[Option[M]] = {
     collection
       .find(r.q.sel)
       .sort(r.q.sort)
