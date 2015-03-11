@@ -13,36 +13,41 @@ class SprongoCollection(database: DB, collName: String, failover: FailoverStrate
   extends BSONCollection(database, collName, failover) {
 
   implicit private val ec: ExecutionContext = database.connection.actorSystem.dispatcher
+  //TODO: get rid of this reference
   def collection: BSONCollection = this
 
   /**********************************************************************************
     * Count Command
     *********************************************************************************/
+
   def exec[T](query: CountQuery[T])(implicit writer: BSONDocumentWriter[T]): Future[Int] = {
-    db.command(new Count(collName, Some(writer.write(query.selector))))
+    database.command(new Count(collName, Some(writer.write(query.selector))))
   }
 
   /**********************************************************************************
-    * Distinct Command - Eventually move to Dsl so we can pass in readPref
+    * Distinct Command
     *********************************************************************************/
-  def distinct[T](field: String, query: T = BSONDocument())(implicit writer: BSONDocumentWriter[T]): Future[BSONArray] = {
-    db.command(new Distinct(collName, field, Some(writer.write(query))))
-  }
 
-  def distinct(field: String, query: Producer[(String, BSONValue)]*): Future[BSONArray] = {
-    distinct(field, BSONDocument(query: _*))
+  def exec[T](query: DistinctQuery[T])(implicit writer: BSONDocumentWriter[T]): Future[BSONArray] = {
+    database.command(new Distinct(collName, query.field, Some(writer.write(query.selector))))
   }
 
   /**********************************************************************************
-    * Creates
+    * Create Document
     *********************************************************************************/
-  def exec(c: CreateQuery): Future[LastError] = {
-    collection.insert(c.document)
+
+  def exec[T](c: CreateQuery[T])(implicit writer: BSONDocumentWriter[T]): Future[LastError] = {
+    insert(c.doc, c.writeConcern)
   }
 
-//  def exec[M](c: CreateBulkQuery[M])(implicit writer: BSONDocumentWriter[M]): Future[Int] = {
-//    collection.bulkInsert(Enumerator.enumerate(c.ds), bulkSize = c.bulkSize, bulkByteSize = c.bulkByteSize)
-//  }
+  def exec[T](c: CreateBulkQuery[T])(implicit writer: BSONDocumentWriter[T]): Future[Int] = {
+    bulkInsert(
+      enumerator = Enumerator.enumerate(c.ds),
+      bulkSize = c.bulkSize,
+      bulkByteSize = c.bulkByteSize,
+      writeConcern = c.writeConcern
+    )
+  }
 
   /**********************************************************************************
     * Updates
