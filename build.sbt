@@ -79,7 +79,6 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
-  "io.spray"          %% "spray-json"      % "1.3.1",
   "joda-time"          % "joda-time"       % "2.3",
   "org.joda"           % "joda-convert"    % "1.5"
 )

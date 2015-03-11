@@ -1,10 +1,7 @@
 package com.zipfworks.sprongo
 
 import reactivemongo.api.bulk
-import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.GetLastError
-import spray.json._
-
 
 case class CreateQuery[T](
   doc: T,
@@ -35,3 +32,4 @@ trait CreateDSL {
 }
 
 object CreateDSL extends CreateDSL
+
