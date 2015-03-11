@@ -3,7 +3,7 @@ package com.zipfworks.sprongo
 import org.joda.time.DateTime
 import reactivemongo.bson._
 
-trait SprongoConverters {
+object SprongoConverters {
 
   implicit object IntTupleHandler extends BSONWriter[(Int, Int), BSONArray] with BSONReader[BSONArray, (Int, Int)] {
     override def write(t: (Int, Int)): BSONArray = BSONArray(BSONInteger(t._1), BSONInteger(t._2))
@@ -16,6 +16,4 @@ trait SprongoConverters {
   }
 
 }
-
-object SprongoConverters extends SprongoConverters
 

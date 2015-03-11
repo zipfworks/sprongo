@@ -1,7 +1,7 @@
-package com.zipfworks.sprongo
+package com.zipfworks.sprongo.dsl
 
 import reactivemongo.api.ReadPreference
-import reactivemongo.bson.{Producer, BSONValue, BSONDocument}
+import reactivemongo.bson.{BSONDocument, BSONValue, Producer}
 
 case class CountQuery[T](
   selector: T = BSONDocument(),

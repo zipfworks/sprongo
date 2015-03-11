@@ -3,6 +3,7 @@ package com.zipfworks.sprongo
 import java.util.UUID
 
 import akka.actor.ActorSystem
+import com.zipfworks.sprongo.dsl.SprongoDSL
 import reactivemongo.api.MongoConnection
 import reactivemongo.bson.Macros
 import reactivemongo.bson.Macros.Annotations.Key

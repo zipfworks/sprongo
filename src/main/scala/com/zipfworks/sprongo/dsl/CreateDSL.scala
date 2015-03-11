@@ -1,4 +1,4 @@
-package com.zipfworks.sprongo
+package com.zipfworks.sprongo.dsl
 
 import reactivemongo.api.bulk
 import reactivemongo.core.commands.GetLastError

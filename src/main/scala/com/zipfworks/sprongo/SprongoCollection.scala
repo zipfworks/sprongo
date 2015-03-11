@@ -1,6 +1,7 @@
 package com.zipfworks.sprongo
 
 import com.zipfworks.sprongo.commands.Distinct
+import com.zipfworks.sprongo.dsl._
 import play.api.libs.iteratee.Enumerator
 import reactivemongo.api.{Cursor, FailoverStrategy, DB}
 import reactivemongo.api.collections.default.BSONCollection

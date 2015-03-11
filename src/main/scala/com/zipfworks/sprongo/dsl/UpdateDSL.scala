@@ -1,6 +1,6 @@
-package com.zipfworks.sprongo
+package com.zipfworks.sprongo.dsl
 
-import reactivemongo.bson.{Producer, BSONValue, BSONDocument}
+import reactivemongo.bson.{BSONDocument, BSONValue, Producer}
 import reactivemongo.core.commands.GetLastError
 
 case class UpdateQuery(

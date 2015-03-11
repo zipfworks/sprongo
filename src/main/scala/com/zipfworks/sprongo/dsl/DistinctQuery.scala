@@ -1,7 +1,7 @@
-package com.zipfworks.sprongo
+package com.zipfworks.sprongo.dsl
 
 import reactivemongo.api.ReadPreference
-import reactivemongo.bson.{BSONValue, Producer, BSONDocument}
+import reactivemongo.bson.{BSONDocument, BSONValue, Producer}
 
 case class DistinctQuery[T](
   field: String,
