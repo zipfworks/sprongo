@@ -30,7 +30,7 @@ trait ReadDSL {
   case class ReadQuery(
     sel: BSONDocument,
     sort: BSONDocument = BSONDocument(),
-    rp: ReadPreference = ReadPreference.secondaryPrefered,
+    rp: ReadPreference = ReadPreference.secondaryPreferred,
     opts: QueryOpts = QueryOpts().slaveOk,
     limit: Option[Int] = None
   ){

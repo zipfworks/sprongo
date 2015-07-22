@@ -1,14 +1,22 @@
 package com.zipfworks.sprongo.driver
 
-import akka.actor.ActorSystem
-import reactivemongo.api.MongoDriver
+import com.typesafe.config.Config
+import reactivemongo.api.{MongoConnectionOptions, MongoDriver}
 import reactivemongo.core.nodeset.Authenticate
 
 case class SprongoDriver(
   nodes: Seq[String],
-  auth: List[Authenticate] = Nil,
-  numChannelsPerNode: Int = 10
-)(implicit system: ActorSystem) {
-  val driver = new MongoDriver(system)
-  val connection = driver.connection(nodes, nbChannelsPerNode = numChannelsPerNode, authentications = auth)
+  auth: Seq[Authenticate] = Seq.empty,
+  options: MongoConnectionOptions = MongoConnectionOptions(),
+  name: Option[String] = None,
+  config: Option[Config] = None
+){
+  //creating drivers and connections aren't free... so they MUST BE A _VAL_
+  val driver = new MongoDriver()
+  val connection = driver.connection(
+    nodes = nodes,
+    options = options,
+    authentications = auth,
+    name = name
+  )
 }

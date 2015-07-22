@@ -40,12 +40,12 @@ object JsonBsonConverter {
     jsVal match {
       case _: JsString => BSONString(jsVal.asInstanceOf[JsString].value)
       case _: JsNumber => jsVal.asInstanceOf[JsNumber].value match {
-        case num if num.isValidLong => BSONLong(num.toLong)
-        case num if num.isValidDouble => BSONDouble(num.toDouble)
-        case num if num.isValidInt => BSONInteger(num.toInt)
-        case num if num.isValidFloat => BSONDouble(num.toFloat)
-        case num if num.isValidShort => BSONInteger(num.toShortExact)
-        case num => BSONDouble(num.toDouble)}
+        case num if num.isValidLong     => BSONLong(num.toLong)
+        case num if num.isDecimalDouble => BSONDouble(num.toDouble)
+        case num if num.isValidInt      => BSONInteger(num.toInt)
+        case num if num.isDecimalFloat  => BSONDouble(num.toFloat)
+        case num if num.isValidShort    => BSONInteger(num.toShortExact)
+        case num                        => BSONDouble(num.toDouble)}
       case _: JsBoolean => BSONBoolean(jsVal.asInstanceOf[JsBoolean].value)
       case _: JsArray => jsVal.asInstanceOf[JsArray].elements.foldLeft(BSONArray())((arr, jsval) => arr.add(jsValueToBsonVal(jsval)))
       case _: JsObject => jsObjToBdoc(jsVal.asJsObject)

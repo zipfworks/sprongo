@@ -1,14 +1,8 @@
-import SonatypeKeys._
-
-sonatypeSettings
-
 name := "sprongo"
 
-version := "1.3.1-SNAPSHOT"
+version := "2.0.0-SNAPSHOT"
 
-scalaVersion := "2.10.3"
-
-crossScalaVersions := Seq("2.11.5", "2.10.3")
+scalaVersion := "2.11.6"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
@@ -16,22 +10,22 @@ organization := "com.zipfworks"
 
 credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
-//publishTo <<= (version) { version: String =>
-//  val nexus = "https://oss.sonatype.org/"
-//  if (version.trim.endsWith("SNAPSHOT")) {
-//    Some("snapshots" at nexus + "content/repositories/snapshots")
-//   } else {
-//    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-//  }
-//}
-
-publishTo := {
-  val nexus = "https://nexus.zipfworks.com/content/repositories/"
-  if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "snapshots")
-  else
-    Some("releases"  at nexus + "releases")
+publishTo <<= (version) { version: String =>
+  val nexus = "https://oss.sonatype.org/"
+  if (version.trim.endsWith("SNAPSHOT")) {
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+   } else {
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  }
 }
+
+//publishTo := {
+//  val nexus = "https://nexus.zipfworks.com/content/repositories/"
+//  if (version.value.trim.endsWith("SNAPSHOT"))
+//    Some("snapshots" at nexus + "snapshots")
+//  else
+//    Some("releases"  at nexus + "releases")
+//}
 
 publishMavenStyle := true
 
@@ -78,10 +72,8 @@ resolvers := Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.reactivemongo" %% "reactivemongo"   % "0.10.5.0.akka23",
+  "org.reactivemongo" %% "reactivemongo"   % "0.11.3",
   "io.spray"          %% "spray-json"      % "1.3.1",
   "joda-time"          % "joda-time"       % "2.3",
   "org.joda"           % "joda-convert"    % "1.5"
 )
-
-org.scalastyle.sbt.ScalastylePlugin.Settings

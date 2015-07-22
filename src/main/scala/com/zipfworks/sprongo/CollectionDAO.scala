@@ -1,16 +1,15 @@
 package com.zipfworks.sprongo
 
+import com.zipfworks.sprongo.commands.BSONDistinctCommand._
 import play.api.libs.iteratee.Enumerator
+import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson._
 import reactivemongo.api.Cursor
 import scala.concurrent.{Future, ExecutionContext}
 import spray.json._
-import reactivemongo.core.commands.{LastError, Count}
-import com.zipfworks.sprongo.commands.Distinct
 import ExtendedJsonProtocol._
-import reactivemongo.api.QueryOpts
 import reactivemongo.api.DefaultDB
-import reactivemongo.api.collections.default.BSONCollection
 import SprongoDSL._
 
 class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionContext, jsFormat: RootJsonFormat[M], db: DefaultDB) {
@@ -20,8 +19,6 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
 
   //defaults
   private val defaultQueryDoc = BSONDocument()
-  private val defaultQueryOpts = QueryOpts().slaveOk
-  private val defaultSortDoc = BSONDocument()
 
   private implicit val docReader = new BSONDocumentReader[M] {
     def read(bson: BSONDocument) = {
@@ -41,32 +38,25 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
     }
   }
 
-  private def addSkip(skip: Int, options: QueryOpts): QueryOpts = {
-    if(skip < 0) options else options.skip(skip)
-  }
-
   def count(query: BSONDocument = defaultQueryDoc): Future[Int] = {
-    db.command(new Count(collectionName, Some(query)))
+    collection.count(Some(query))
   }
 
   def distinct(field: String, query: BSONDocument = defaultQueryDoc): Future[BSONArray] = {
-    db.command(new Distinct(collectionName, field, Some(query)))
+    import com.zipfworks.sprongo.commands.BSONDistinctCommand.Implicits._
+    collection.runCommand(Distinct(field, query))
   }
   /**********************************************************************************
     * Creates
     *********************************************************************************/
-  def exec(c: CreateQuery): Future[LastError] = {
+  def exec(c: CreateQuery): Future[WriteResult] = {
     collection.insert(c.document)
-  }
-
-  def exec(c: CreateBulkQuery[M]): Future[Int] = {
-    collection.bulkInsert(Enumerator.enumerate(c.ds), bulkSize = c.bulkSize, bulkByteSize = c.bulkByteSize)
   }
 
   /**********************************************************************************
     * Updates
     *********************************************************************************/
-  def exec(u: UpdateQuery): Future[LastError] = {
+  def exec(u: UpdateQuery): Future[WriteResult] = {
     collection.update(
       selector = u.selector,
       update = u.update,
@@ -74,7 +64,7 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
       multi = u.multi)
   }
 
-  def exec(u: UpdateModelQuery[M]): Future[LastError] = {
+  def exec(u: UpdateModelQuery[M]): Future[WriteResult] = {
     collection.update(
       selector = BSONDocument("_id" -> u.m.id),
       update = JsonBsonConverter.jsObjToBdoc(u.m.toJson.asJsObject),
@@ -86,14 +76,14 @@ class CollectionDAO[M <: Model](collectionName: String)(implicit ec: ExecutionCo
   /**********************************************************************************
     * Deletes
     *********************************************************************************/
-  def exec(d: DeleteQuery): Future[LastError] = {
+  def exec(d: DeleteQuery): Future[WriteResult] = {
     collection.remove(
       query = d.s,
       firstMatchOnly = d.firstMatchOnly
     )
   }
 
-  def exec(d: DeleteModelQuery[M]): Future[LastError] = {
+  def exec(d: DeleteModelQuery[M]): Future[WriteResult] = {
     collection.remove(
       query = BSONDocument("_id" -> d.m.id),
       firstMatchOnly = d.firstMatchOnly
