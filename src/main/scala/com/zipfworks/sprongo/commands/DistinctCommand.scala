@@ -26,7 +26,7 @@ object BSONDistinctCommand extends DistinctCommand[BSONSerializationPack.type] {
 
     implicit object BSONReader extends BSONDocumentReader[BSONArray] {
       override def read(bson: BSONDocument): BSONArray = {
-        bson.asInstanceOf[BSONArray]
+        bson.getAs[BSONArray]("values").getOrElse(BSONArray())
       }
     }
   }
