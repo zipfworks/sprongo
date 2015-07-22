@@ -11,8 +11,8 @@ trait DBBuilder {
   val dbName: String
   val connection: MongoConnection
 
-  private def executionContext: ExecutionContext = connection.actorSystem.dispatcher
-  private def defaultDB: DefaultDB = connection(dbName)(executionContext)
+  private val executionContext: ExecutionContext = connection.actorSystem.dispatcher
+  val defaultDB: DefaultDB = connection(dbName)(executionContext)
 
   def getCollection[M <: Model](collName: String)(implicit js: RootJsonFormat[M]) = {
     new CollectionDAO[M](collName)(ec = executionContext, jsFormat = js, db = defaultDB)
