@@ -1,6 +1,5 @@
 package com.zipfworks.sprongo.commands
 
-import com.zipfworks.sprongo.JsonBsonConverter
 import reactivemongo.api.{BSONSerializationPack, SerializationPack}
 import reactivemongo.api.commands._
 import reactivemongo.bson.{BSONArray, BSONDocumentReader, BSONDocumentWriter, BSONDocument}
