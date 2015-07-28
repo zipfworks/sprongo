@@ -1,5 +1,6 @@
 package com.zipfworks.sprongo.commands
 
+import com.zipfworks.sprongo.JsonBsonConverter
 import reactivemongo.api.{BSONSerializationPack, SerializationPack}
 import reactivemongo.api.commands._
 import reactivemongo.bson.{BSONArray, BSONDocumentReader, BSONDocumentWriter, BSONDocument}
@@ -26,7 +27,7 @@ object BSONDistinctCommand extends DistinctCommand[BSONSerializationPack.type] {
 
     implicit object BSONReader extends BSONDocumentReader[BSONArray] {
       override def read(bson: BSONDocument): BSONArray = {
-        bson.getAs[BSONArray]("values").getOrElse(BSONArray())
+        bson.get("values").get.asInstanceOf[BSONArray]
       }
     }
   }
