@@ -3,6 +3,8 @@
 Sprongo provides [ReactiveMongo](http://reactivemongo.org/) integration
 with [Spray](http://spray.io/) which makes building a REST API easier.
 
+This library helps power the API at [https://dealspotr.com/](https://dealspotr.com/)
+
 ## Building the Library ##
 
 To use Sprongo, you'll need to build the project and publish it locally
