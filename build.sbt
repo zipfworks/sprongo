@@ -1,8 +1,8 @@
 name := "sprongo"
 
-version := "2.0.1-SNAPSHOT"
+version := "2.0.2-SNAPSHOT"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.8"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
@@ -73,7 +73,6 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo"   % "0.11.4",
-  "io.spray"          %% "spray-json"      % "1.3.1",
-  "joda-time"          % "joda-time"       % "2.3",
-  "org.joda"           % "joda-convert"    % "1.5"
+  "io.spray"          %% "spray-json"      % "1.3.3",
+  "joda-time"          % "joda-time"       % "2.3"
 )
