@@ -10,22 +10,22 @@ organization := "com.zipfworks"
 
 credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
-publishTo <<= (version) { version: String =>
-  val nexus = "https://oss.sonatype.org/"
-  if (version.trim.endsWith("SNAPSHOT")) {
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-   } else {
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
-}
-
-//publishTo := {
-//  val nexus = "https://nexus.zipfworks.com/content/repositories/"
-//  if (version.value.trim.endsWith("SNAPSHOT"))
-//    Some("snapshots" at nexus + "snapshots")
-//  else
-//    Some("releases"  at nexus + "releases")
+//publishTo <<= (version) { version: String =>
+//  val nexus = "https://oss.sonatype.org/"
+//  if (version.trim.endsWith("SNAPSHOT")) {
+//    Some("snapshots" at nexus + "content/repositories/snapshots")
+//   } else {
+//    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+//  }
 //}
+
+publishTo := {
+  val nexus = "https://nexus.zipfworks.com/content/repositories/"
+  if (version.value.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "snapshots")
+  else
+    Some("releases"  at nexus + "releases")
+}
 
 publishMavenStyle := true
 
